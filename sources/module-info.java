@@ -14,6 +14,7 @@ module com.s8.web.xenon {
 	
 	
 	requires transitive com.s8.io.bytes;
+	requires transitive com.s8.io.bohr.atom;
 	requires transitive com.s8.io.bohr.neon;
 	requires transitive com.s8.io.xml;
 	requires transitive com.s8.arch.silicon;
@@ -21,5 +22,4 @@ module com.s8.web.xenon {
 	requires transitive com.s8.io.csv;
 	requires transitive com.s8.web.helium;
 	requires transitive com.s8.web.carbon;
-	requires com.s8.io.bohr.atom;
 }
