@@ -17,6 +17,8 @@ import com.s8.stack.arch.helium.http2.HTTP2_Connection;
 import com.s8.stack.arch.helium.http2.HTTP2_Endpoint;
 import com.s8.stack.arch.helium.http2.HTTP2_Status;
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
+import com.s8.stack.servers.xenon.tasks.RespondOk;
+import com.s8.stack.servers.xenon.tasks.SendError;
 
 
 /**
@@ -144,6 +146,7 @@ public class XenonWebConnection extends HTTP2_Connection {
 
 			case BOHR_Methods.WEB_RUN_FUNC: 
 				serveFunc(inflow, response);
+				
 				break;
 			
 			case BOHR_Methods.WEB_DEBUG_BOOT: 
@@ -165,7 +168,7 @@ public class XenonWebConnection extends HTTP2_Connection {
 	
 	
 	private void serveInit(ByteInflow inflow, HTTP2_Message response) {
-		ng.pushT1Task(new HTTP2_ResponseT1Task(response) {
+		ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
 
 			public @Override String describe() { return "Normal server processing"; }
 
@@ -175,7 +178,9 @@ public class XenonWebConnection extends HTTP2_Connection {
 			public void run() {
 
 				// build new branch
-				branch = new NeBranch("live", "w");
+				XeSyncFuncGenerator sync = new XeSyncFuncGenerator(ng);
+				branch = new NeBranch("live", "w", sync);
+				sync.branch = branch;
 				
 				
 				try {
@@ -185,11 +190,11 @@ public class XenonWebConnection extends HTTP2_Connection {
 					LinkedByteOutflow outflow = new LinkedByteOutflow(1024);
 					branch.outbound.publish(outflow);
 					LinkedBytes bytes = outflow.getHead();
-					ng.pushT1Task(new HTTP2_ResponseT1Task.OK(response, bytes));
+					ng.pushAsyncTask(new RespondOk(response, bytes));
 				} 
 				catch (Exception e) {
 					e.printStackTrace();
-					ng.pushT1Task(new HTTP2_ResponseT1Task.Error(response, HTTP2_Status.BAD_REQUEST, "Error"));
+					ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error"));
 				}
 			}
 		});
@@ -197,7 +202,7 @@ public class XenonWebConnection extends HTTP2_Connection {
 
 	
 	private void serveFunc(ByteInflow inflow, HTTP2_Message response) {
-		ng.pushT1Task(new HTTP2_ResponseT1Task(response) {
+		ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
 
 			public @Override String describe() { return "Normal server processing"; }
 
@@ -207,20 +212,14 @@ public class XenonWebConnection extends HTTP2_Connection {
 			public void run() {
 				try {
 					
-					// branch inbound
-					branch.inbound.consume(inflow);
+					XeContext context = new XeContext(response);
 					
-					
-					LinkedByteOutflow outflow = new LinkedByteOutflow(1024);
-					
-					branch.outbound.publish(outflow);
-					
-					ng.pushT1Task(new HTTP2_ResponseT1Task.OK(response, outflow.getHead()));
+					/* branch inbound -> fire the appropriate function */
+					branch.inbound.consume(context, inflow);
 					
 				} 
 				catch (IOException e) {
-					ng.pushT1Task(new HTTP2_ResponseT1Task.Error(response, HTTP2_Status.BAD_REQUEST, 
-							"Error: "+e.getMessage()));
+					ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error: "+e.getMessage()));
 				}
 			}
 			
@@ -232,7 +231,7 @@ public class XenonWebConnection extends HTTP2_Connection {
 	
 	
 	private void serveError(HTTP2_Message request, HTTP2_Status status, String message) {
-		ng.pushT1Task(new HTTP2_ResponseT1Task.Error(request.respond(), status, message));
+		ng.pushAsyncTask(new SendError(request.respond(), status, message));
 	}
 
 
