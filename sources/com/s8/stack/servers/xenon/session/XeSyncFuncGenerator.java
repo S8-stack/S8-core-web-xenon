@@ -1,4 +1,4 @@
-package com.s8.stack.servers.xenon;
+package com.s8.stack.servers.xenon.session;
 
 import java.io.IOException;
 

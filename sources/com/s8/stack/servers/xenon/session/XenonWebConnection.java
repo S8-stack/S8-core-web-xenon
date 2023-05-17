@@ -1,4 +1,4 @@
-package com.s8.stack.servers.xenon;
+package com.s8.stack.servers.xenon.session;
 
 
 
@@ -17,6 +17,8 @@ import com.s8.stack.arch.helium.http2.HTTP2_Connection;
 import com.s8.stack.arch.helium.http2.HTTP2_Endpoint;
 import com.s8.stack.arch.helium.http2.HTTP2_Status;
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
+import com.s8.stack.servers.xenon.HTTP2_ResponseT1Task;
+import com.s8.stack.servers.xenon.XenonWebServer;
 import com.s8.stack.servers.xenon.tasks.RespondOk;
 import com.s8.stack.servers.xenon.tasks.SendError;
 

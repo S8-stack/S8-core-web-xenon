@@ -1,4 +1,4 @@
-package com.s8.stack.servers.xenon;
+package com.s8.stack.servers.xenon.session;
 
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
 
