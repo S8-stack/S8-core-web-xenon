@@ -29,6 +29,13 @@ public class RespondOk implements AsyncTask {
 	}
 	
 	
+	public RespondOk(HTTP2_Message response, String message) {
+		super();
+		this.response = response;
+		this.head = new LinkedBytes(message.getBytes());;
+	}
+	
+	
 
 	@Override
 	public String describe() {

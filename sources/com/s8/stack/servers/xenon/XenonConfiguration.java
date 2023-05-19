@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.s8.arch.magnesium.service.MgConfiguration;
 import com.s8.arch.silicon.SiliconConfiguration;
 import com.s8.io.xml.annotations.XML_SetElement;
 import com.s8.io.xml.annotations.XML_Type;
@@ -39,6 +40,13 @@ public class XenonConfiguration {
 	@XML_SetElement(tag = "carbon")
 	public void setService(CarbonWebService.Config config) {
 		this.carbon = config;
+	}
+	
+	public MgConfiguration magnesium;
+
+	@XML_SetElement(tag = "magnesium")
+	public void setMagnesiumService(MgConfiguration config) {
+		this.magnesium = config;
 	}
 
 

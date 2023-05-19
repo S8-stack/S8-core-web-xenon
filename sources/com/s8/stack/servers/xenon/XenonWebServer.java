@@ -2,7 +2,12 @@ package com.s8.stack.servers.xenon;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
+import java.nio.file.Path;
 
+import com.s8.arch.magnesium.databases.repo.store.RepoMgDatabase;
+import com.s8.arch.magnesium.databases.space.store.SpaceMgDatabase;
+import com.s8.arch.magnesium.databases.user.UserMgDatabase;
+import com.s8.arch.magnesium.service.MgConfiguration;
 import com.s8.arch.silicon.SiliconEngine;
 import com.s8.io.xml.handler.XML_Lexicon;
 import com.s8.stack.arch.helium.http1.HTTP1_Server;
@@ -25,13 +30,13 @@ public class XenonWebServer extends HTTP2_Server {
 
 
 
-	public static XenonWebServer build(XeBoot boot, String configPathname) throws Exception {
+	public static XenonWebServer build(XeCodebase codebase, XeBoot boot, String configPathname) throws Exception {
 		// build context
 		XML_Lexicon lexicon = new XML_Lexicon(XenonConfiguration.class);
 
 		XenonConfiguration configuration = XenonConfiguration.load(lexicon, configPathname);
 
-		return new XenonWebServer(boot, lexicon, configuration);
+		return new XenonWebServer(codebase, boot, lexicon, configuration);
 	}
 
 
@@ -40,6 +45,8 @@ public class XenonWebServer extends HTTP2_Server {
 
 	public final SiliconEngine siliconEngine;
 
+	public final XeCodebase codebase;
+	
 	public final XeBoot boot;
 
 
@@ -48,6 +55,15 @@ public class XenonWebServer extends HTTP2_Server {
 	 */
 	public final CarbonWebService carbonWebService;
 
+	
+	
+	public final UserMgDatabase userDb;
+	
+	public final SpaceMgDatabase spaceDb;
+	
+	public final RepoMgDatabase repoDb;
+	
+	
 
 	private final HTTP2_WebConfiguration webConfig;
 
@@ -62,12 +78,15 @@ public class XenonWebServer extends HTTP2_Server {
 	 * @param methodsService
 	 * @throws Exception
 	 */
-	public XenonWebServer(XeBoot boot,
+	public XenonWebServer(
+			XeCodebase codebase,
+			XeBoot boot,
 			XML_Lexicon lexicon,
 			XenonConfiguration configuration) throws Exception {
 		super();
 
 
+		this.codebase = codebase;
 		this.boot = boot;
 
 
@@ -84,6 +103,27 @@ public class XenonWebServer extends HTTP2_Server {
 		 * create CARBON SERVICE
 		 */
 		carbonWebService = new CarbonWebService(siliconEngine, lexicon, configuration.carbon);
+		
+		
+		
+		/* create user database */
+		MgConfiguration magnesium = configuration.magnesium;
+		if(magnesium.userDbConfigPathname == null) {
+			throw new IOException("A path must be defined for the user db");
+		}
+		userDb = new UserMgDatabase(siliconEngine, codebase.user, Path.of(magnesium.userDbConfigPathname));
+		
+		/* create space database */
+		if(magnesium.spaceDbConfigPathname == null) {
+			throw new IOException("A path must be defined for the space db");
+		}
+		spaceDb = new SpaceMgDatabase(siliconEngine, codebase.space, Path.of(magnesium.spaceDbConfigPathname));
+		
+		/* repository database */
+		if(magnesium.repoDbConfigPathname == null) {
+			throw new IOException("A path must be defined for the repo db");
+		}
+		repoDb = new RepoMgDatabase(siliconEngine, codebase.repo, Path.of(magnesium.repoDbConfigPathname));
 
 
 		if(isRedirecting = (configuration.http1_redirection!=null)) {

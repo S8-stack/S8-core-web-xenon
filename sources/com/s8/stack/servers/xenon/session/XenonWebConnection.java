@@ -18,7 +18,9 @@ import com.s8.stack.arch.helium.http2.HTTP2_Endpoint;
 import com.s8.stack.arch.helium.http2.HTTP2_Status;
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
 import com.s8.stack.servers.xenon.HTTP2_ResponseT1Task;
+import com.s8.stack.servers.xenon.XeUser;
 import com.s8.stack.servers.xenon.XenonWebServer;
+import com.s8.stack.servers.xenon.flow.XeAsyncFlow;
 import com.s8.stack.servers.xenon.tasks.RespondOk;
 import com.s8.stack.servers.xenon.tasks.SendError;
 
@@ -51,26 +53,18 @@ public class XenonWebConnection extends HTTP2_Connection {
 	final XenonWebServer server;
 	
 	final SiliconEngine ng;
-
-	//private final SignUpModule signUp;
 	
-	//private final LogInModule logIn;
-	
-	//private final CtrlModule ctrl;
-
-	//private final DebugBootModule debugBoot;
-	
-	
-	private NeBranch branch;
+	private NeBranch neBranch;
 	
 	
 
 	
-	/**
-	 * 
-	 */
-	volatile boolean isLoggedIn;
+	
+	public final Object lock = new Object();
 
+	public volatile  boolean isLoggedIn = false;
+	
+	public XeUser user;
 
 	/**
 	 * Current session
@@ -145,10 +139,14 @@ public class XenonWebConnection extends HTTP2_Connection {
 			int forkCode = inflow.getUInt8();
 			
 			switch(forkCode){
+			
+			
+			case BOHR_Methods.WEB_LOG_IN:
+				serveLogIn(inflow, response);
+				break;
 
 			case BOHR_Methods.WEB_RUN_FUNC: 
 				serveFunc(inflow, response);
-				
 				break;
 			
 			case BOHR_Methods.WEB_DEBUG_BOOT: 
@@ -166,7 +164,46 @@ public class XenonWebConnection extends HTTP2_Connection {
 		}
 	}
 
+	
+	
+	
+	/**
+	 * 
+	 * @param inflow
+	 * @param response
+	 * @throws IOException
+	 */
+	private void serveLogIn(ByteInflow inflow, HTTP2_Message response) throws IOException {
+		String username = inflow.getStringUTF8();
+		String password = inflow.getStringUTF8();
+		
+		
+		server.userDb.get(0, username,
+				object -> {
+					XeUser user = (XeUser) object;
+					if(user.password.equals(password)) {
+						logIn(user);	
+						ng.pushAsyncTask(new RespondOk(response, "Successfully logged-in"));
+					}
+					else {
+						ng.pushAsyncTask(new SendError(response, HTTP2_Status.Locked, "Error"));
+					}
+				}, 
+				e -> {
+					e.printStackTrace();
+					ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error"));
+				});
+	}
 
+	
+	private void logIn(XeUser user) {
+		synchronized (lock) {
+			this.isLoggedIn = isLoggedIn;
+			this.user = user;
+		}
+	}
+	
+	
 	
 	
 	private void serveInit(ByteInflow inflow, HTTP2_Message response) {
@@ -180,17 +217,14 @@ public class XenonWebConnection extends HTTP2_Connection {
 			public void run() {
 
 				// build new branch
-				XeSyncFuncGenerator sync = new XeSyncFuncGenerator(ng);
-				branch = new NeBranch("live", "w", sync);
-				sync.branch = branch;
-				
+				neBranch = new NeBranch("w");
 				
 				try {
 					// boot...
-					server.boot.boot(branch);
+					server.boot.boot(neBranch);
 					
 					LinkedByteOutflow outflow = new LinkedByteOutflow(1024);
-					branch.outbound.publish(outflow);
+					neBranch.outbound.publish(outflow);
 					LinkedBytes bytes = outflow.getHead();
 					ng.pushAsyncTask(new RespondOk(response, bytes));
 				} 
@@ -214,10 +248,11 @@ public class XenonWebConnection extends HTTP2_Connection {
 			public void run() {
 				try {
 					
-					XeContext context = new XeContext(response);
+					
+					XeAsyncFlow flow = new XeAsyncFlow(server, ng, neBranch, response);
 					
 					/* branch inbound -> fire the appropriate function */
-					branch.inbound.consume(context, inflow);
+					neBranch.inbound.consume(flow, inflow);
 					
 				} 
 				catch (IOException e) {
