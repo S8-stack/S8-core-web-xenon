@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sources xmlns="http://s8.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://s8.com schema.xsd">
-	<root-local-path>/Users/pc/qx/git/com.s8.stack.web/web-sources/s8-stack-servers/</root-local-path>
-	<root-web-path>/s8-stack-servers/</root-web-path>
+	<root-local-path>/Users/pc/qx/git/com.s8.web.xenon/web-sources/s8-web-xenon/</root-local-path>
+	<root-web-path>/s8-web-xenon/</root-web-path>
 	<html-filter cache="PRODUCTION" frag-length="1024">
 		<pattern>**.html</pattern>
 	</html-filter>
