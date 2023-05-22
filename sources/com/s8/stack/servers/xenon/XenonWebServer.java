@@ -9,7 +9,7 @@ import com.s8.arch.magnesium.databases.space.store.SpaceMgDatabase;
 import com.s8.arch.magnesium.databases.user.UserMgDatabase;
 import com.s8.arch.magnesium.service.MgConfiguration;
 import com.s8.arch.silicon.SiliconEngine;
-import com.s8.io.xml.handler.XML_Lexicon;
+import com.s8.io.xml.codebase.XML_Codebase;
 import com.s8.stack.arch.helium.http1.HTTP1_Server;
 import com.s8.stack.arch.helium.http1.pre.HTTP1_Redirection;
 import com.s8.stack.arch.helium.http2.HTTP2_Server;
@@ -32,7 +32,7 @@ public class XenonWebServer extends HTTP2_Server {
 
 	public static XenonWebServer build(XeCodebase codebase, XeBoot boot, String configPathname) throws Exception {
 		// build context
-		XML_Lexicon lexicon = new XML_Lexicon(XenonConfiguration.class);
+		XML_Codebase lexicon = XML_Codebase.from(XenonConfiguration.class);
 
 		XenonConfiguration configuration = XenonConfiguration.load(lexicon, configPathname);
 
@@ -81,7 +81,7 @@ public class XenonWebServer extends HTTP2_Server {
 	public XenonWebServer(
 			XeCodebase codebase,
 			XeBoot boot,
-			XML_Lexicon lexicon,
+			XML_Codebase lexicon,
 			XenonConfiguration configuration) throws Exception {
 		super();
 

@@ -10,7 +10,7 @@ import com.s8.arch.magnesium.service.MgConfiguration;
 import com.s8.arch.silicon.SiliconConfiguration;
 import com.s8.io.xml.annotations.XML_SetElement;
 import com.s8.io.xml.annotations.XML_Type;
-import com.s8.io.xml.handler.XML_Lexicon;
+import com.s8.io.xml.codebase.XML_Codebase;
 import com.s8.io.xml.handler.type.XML_TypeCompilationException;
 import com.s8.io.xml.parser.XML_ParsingException;
 import com.s8.stack.arch.helium.http2.HTTP2_WebConfiguration;
@@ -70,7 +70,7 @@ public class XenonConfiguration {
 	 * @throws XML_TypeCompilationException
 	 * @throws FileNotFoundException
 	 */
-	public static XenonConfiguration load(XML_Lexicon xml_Context, String pathname) 
+	public static XenonConfiguration load(XML_Codebase xml_Context, String pathname) 
 			throws 
 			XML_TypeCompilationException, 
 			FileNotFoundException {
