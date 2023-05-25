@@ -6,7 +6,7 @@ import java.nio.file.Path;
 
 import com.s8.arch.magnesium.databases.note.NoteMgDatabase;
 import com.s8.arch.magnesium.databases.repo.store.RepoMgDatabase;
-import com.s8.arch.magnesium.databases.space.store.LithiumMgDatabase;
+import com.s8.arch.magnesium.databases.space.store.SpaceMgDatabase;
 import com.s8.arch.magnesium.service.MgConfiguration;
 import com.s8.arch.silicon.SiliconEngine;
 import com.s8.io.xml.codebase.XML_Codebase;
@@ -59,7 +59,7 @@ public class XenonWebServer extends HTTP2_Server {
 	
 	public final NoteMgDatabase userDb;
 	
-	public final LithiumMgDatabase spaceDb;
+	public final SpaceMgDatabase spaceDb;
 	
 	public final RepoMgDatabase repoDb;
 	
@@ -117,7 +117,7 @@ public class XenonWebServer extends HTTP2_Server {
 		if(magnesium.spaceDbConfigPathname == null) {
 			throw new IOException("A path must be defined for the space db");
 		}
-		spaceDb = new LithiumMgDatabase(siliconEngine, codebase.space, Path.of(magnesium.spaceDbConfigPathname));
+		spaceDb = new SpaceMgDatabase(siliconEngine, codebase.space, Path.of(magnesium.spaceDbConfigPathname));
 		
 		/* repository database */
 		if(magnesium.repoDbConfigPathname == null) {

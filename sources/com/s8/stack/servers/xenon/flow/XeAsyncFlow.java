@@ -321,7 +321,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 			public @Override AsyncTask createTask() { 
 				return new AsyncTask() {
 					public @Override void run() {
-						server.spaceDb.exposureObjects(0, spaceId, exposure, 
+						server.spaceDb.exposeObjects(0, spaceId, exposure, 
 								version -> {
 									onRebased.run(version);
 									roll(true);
