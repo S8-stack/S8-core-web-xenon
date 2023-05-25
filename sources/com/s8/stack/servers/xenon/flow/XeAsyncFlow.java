@@ -2,17 +2,21 @@ package com.s8.stack.servers.xenon.flow;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 
 import com.s8.arch.fluor.S8AsyncFlow;
 import com.s8.arch.fluor.S8CodeBlock;
 import com.s8.arch.fluor.S8ExceptionCatcher;
+import com.s8.arch.fluor.S8Filter;
 import com.s8.arch.fluor.S8ResultProcessor;
+import com.s8.arch.fluor.S8User;
 import com.s8.arch.silicon.SiliconEngine;
 import com.s8.arch.silicon.async.AsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.io.bohr.neodymium.object.NdObject;
 import com.s8.io.bohr.neon.core.NeBranch;
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
+import com.s8.stack.servers.xenon.XeUser;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
 public class XeAsyncFlow implements S8AsyncFlow  {
@@ -21,7 +25,9 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public final XenonWebServer server;
 
 	public final SiliconEngine ng;
-	
+
+	public final XeUser user;
+
 	public final NeBranch branch;
 
 	public final HTTP2_Message response;
@@ -36,7 +42,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 	private volatile boolean isTerminated = false;
-	
+
 	private volatile boolean isActive = false;
 
 	/**
@@ -47,11 +53,13 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	public XeAsyncFlow(XenonWebServer server,
 			SiliconEngine ng, 
+			XeUser user,
 			NeBranch branch,
 			HTTP2_Message response) {
 		super();
 		this.server = server;
 		this.ng = ng;
+		this.user = user;
 		this.branch = branch;
 		this.response = response;
 
@@ -84,8 +92,8 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 		roll(false);
 
 	}
-	
-	
+
+
 	/**
 	 * 
 	 * @param engine
@@ -203,11 +211,133 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	}
 
 
+	/* <process-zerp> */
+
+
+
+	/* <process-beryllium> */
+
+
+
+	@Override
+	public S8User getMe() {
+		return user;
+	}
+
+	@Override
+	public void getUser(String username, S8ResultProcessor<S8User> onRetrieved, S8ExceptionCatcher onFailed) {
+		pushOperationLast(new Operation() {
+			public @Override AsyncTask createTask() { 
+				return new AsyncTask() {
+					public @Override void run() {
+						server.userDb.get(0L, username, 
+								user -> {
+									onRetrieved.run((S8User) user);
+									roll(true);
+								},
+								exception -> {
+									onFailed.run(exception); 
+									roll(true);
+								});
+					}
+					public @Override MthProfile profile() { return MthProfile.FX1; }
+					public @Override String describe() { return "Committing"; }
+				};
+			}
+		});
+	}
+
+
+	@Override
+	public void scanUsers(S8Filter<S8User> filter, S8ResultProcessor<List<S8User>> onSelected, S8ExceptionCatcher onFailed) {
+		pushOperationLast(new Operation() {
+			public @Override AsyncTask createTask() { 
+				return new AsyncTask() {
+					public @Override void run() {
+						server.userDb.select(0L, filter, 
+								selection -> {
+									onSelected.run(selection);
+									roll(true);
+								},
+								exception -> {
+									onFailed.run(exception); 
+									roll(true);
+								});
+					}
+					public @Override MthProfile profile() { return MthProfile.FX1; }
+					public @Override String describe() { return "Committing"; }
+				};
+			}
+		});
+	}
+
+
+
+	/* <process-lithum> */
 
 
 
 
+	@Override
+	public void accessMySpace(S8ResultProcessor<Object[]> onAccessed, S8ExceptionCatcher onException) {
+		accessSpace(getMySpaceId(), onAccessed, onException);
+	}
 
+
+	@Override
+	public void exposeMySpace(Object[] exposure, S8ResultProcessor<Long> onRebased, S8ExceptionCatcher onException) {
+		exposeSpace(getMySpaceId(), exposure, onRebased, onException);
+	}
+
+
+	@Override
+	public void accessSpace(String spaceId, S8ResultProcessor<Object[]> onAccessed, S8ExceptionCatcher onException) {
+		pushOperationLast(new Operation() {
+			public @Override AsyncTask createTask() { 
+				return new AsyncTask() {
+					public @Override void run() {
+						server.spaceDb.accessExposure(0L, spaceId, 
+								exposure -> {
+									onAccessed.run(exposure);
+									roll(true);
+								},
+								exception -> {
+									onException.run(exception);
+									roll(true);
+								}); 
+					}
+					public @Override MthProfile profile() { return MthProfile.FX1; }
+					public @Override String describe() { return "Committing"; }
+				};
+			}
+		});
+	}
+
+
+	@Override
+	public void exposeSpace(String spaceId, Object[] exposure, S8ResultProcessor<Long> onRebased,
+			S8ExceptionCatcher onException) {
+		pushOperationLast(new Operation() {
+			public @Override AsyncTask createTask() { 
+				return new AsyncTask() {
+					public @Override void run() {
+						server.spaceDb.exposureObjects(0, spaceId, exposure, 
+								version -> {
+									onRebased.run(version);
+									roll(true);
+								},
+								exception -> {
+									onException.run(exception);
+									roll(true);
+								});
+					}
+					public @Override MthProfile profile() { return MthProfile.FX1; }
+					public @Override String describe() { return "Committing"; }
+				};
+			}
+		});
+
+	}
 
 
 	@Override
@@ -258,7 +388,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 				};
 			}
 		});
-		
+
 	}
 
 
@@ -305,5 +435,26 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public void terminate() {
 		isTerminated = true;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

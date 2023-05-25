@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Path;
 
+import com.s8.arch.magnesium.databases.note.NoteMgDatabase;
 import com.s8.arch.magnesium.databases.repo.store.RepoMgDatabase;
-import com.s8.arch.magnesium.databases.space.store.SpaceMgDatabase;
-import com.s8.arch.magnesium.databases.user.UserMgDatabase;
+import com.s8.arch.magnesium.databases.space.store.LithiumMgDatabase;
 import com.s8.arch.magnesium.service.MgConfiguration;
 import com.s8.arch.silicon.SiliconEngine;
 import com.s8.io.xml.codebase.XML_Codebase;
@@ -57,9 +57,9 @@ public class XenonWebServer extends HTTP2_Server {
 
 	
 	
-	public final UserMgDatabase userDb;
+	public final NoteMgDatabase userDb;
 	
-	public final SpaceMgDatabase spaceDb;
+	public final LithiumMgDatabase spaceDb;
 	
 	public final RepoMgDatabase repoDb;
 	
@@ -111,13 +111,13 @@ public class XenonWebServer extends HTTP2_Server {
 		if(magnesium.userDbConfigPathname == null) {
 			throw new IOException("A path must be defined for the user db");
 		}
-		userDb = new UserMgDatabase(siliconEngine, codebase.user, Path.of(magnesium.userDbConfigPathname));
+		userDb = new NoteMgDatabase(siliconEngine, codebase.user, Path.of(magnesium.userDbConfigPathname));
 		
 		/* create space database */
 		if(magnesium.spaceDbConfigPathname == null) {
 			throw new IOException("A path must be defined for the space db");
 		}
-		spaceDb = new SpaceMgDatabase(siliconEngine, codebase.space, Path.of(magnesium.spaceDbConfigPathname));
+		spaceDb = new LithiumMgDatabase(siliconEngine, codebase.space, Path.of(magnesium.spaceDbConfigPathname));
 		
 		/* repository database */
 		if(magnesium.repoDbConfigPathname == null) {

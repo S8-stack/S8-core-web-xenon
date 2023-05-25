@@ -127,17 +127,20 @@ public class XenonWebConnection extends HTTP2_Connection {
 
 			switch (forkCode) {
 
+			/* typically step 0 */
 			case XeRequestKeywords.LOG_IN:
 				serveLogIn(inflow, response);
 				break;
 
-			case XeRequestKeywords.RUN_FUNC:
-				serveFunc(inflow, response);
-				break;
-
+			/* typically step 1 : sucessful log-in call boot */
 			case XeRequestKeywords.BOOT:
 				// debugBoot.serve(neRequest, response); break;
 				serveBoot(inflow, response);
+				break;
+
+			/* typically further steps */
+			case XeRequestKeywords.RUN_FUNC:
+				serveFunc(inflow, response);
 				break;
 
 			default:
@@ -210,14 +213,12 @@ public class XenonWebConnection extends HTTP2_Connection {
 				// build new branch
 				neBranch = new NeBranch("w");
 
+				XeAsyncFlow flow = new XeAsyncFlow(server, ng, user, neBranch, response);
+
 				try {
 					// boot...
-					server.boot.boot(neBranch);
-
-					LinkedByteOutflow outflow = new LinkedByteOutflow(1024);
-					neBranch.outbound.publish(outflow);
-					LinkedBytes bytes = outflow.getHead();
-					ng.pushAsyncTask(new RespondOk(response, bytes));
+					server.boot.boot(neBranch, flow);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 					ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error"));
@@ -241,7 +242,7 @@ public class XenonWebConnection extends HTTP2_Connection {
 			public void run() {
 				try {
 
-					XeAsyncFlow flow = new XeAsyncFlow(server, ng, neBranch, response);
+					XeAsyncFlow flow = new XeAsyncFlow(server, ng, user, neBranch, response);
 
 					/* branch inbound -> fire the appropriate function */
 					neBranch.inbound.consume(flow, inflow);

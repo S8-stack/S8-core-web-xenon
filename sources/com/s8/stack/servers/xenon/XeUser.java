@@ -1,12 +1,13 @@
 package com.s8.stack.servers.xenon;
 
+import com.s8.arch.fluor.S8User;
 import com.s8.io.bohr.atom.annotations.S8Field;
 import com.s8.io.bohr.atom.annotations.S8ObjectType;
 import com.s8.io.bohr.beryllium.object.BeObject;
 
 
 @S8ObjectType(name = "base-s8-user")
-public class XeUser extends BeObject {
+public class XeUser extends BeObject implements S8User {
 	
 	
 	@S8Field(name = "display-name")
@@ -15,8 +16,8 @@ public class XeUser extends BeObject {
 	@S8Field(name = "password")
 	public String password;
 	
-	@S8Field(name = "workspace")
-	public String workspace;
+	@S8Field(name = "personal-space-id")
+	public String personalSpaceId;
 	
 	
 	/**
@@ -36,5 +37,11 @@ public class XeUser extends BeObject {
 	
 	public String getPassword() {
 		return password;
+	}
+
+
+	@Override
+	public String getPersonalSpaceId() {
+		return personalSpaceId;
 	}
 }
