@@ -7,6 +7,7 @@
 	<xs:element name="sources" type="tns:com.s8.web.carbon.build.sources.WebSources"/>
 	<xs:element name="S8-Xenon-server" type="tns:com.s8.stack.servers.xenon.XenonConfiguration"/>
 	<xs:element name="HTTP2_WebConfiguration" type="tns:com.s8.stack.arch.helium.http2.HTTP2_WebConfiguration"/>
+	<xs:element name="SSL_WebConfiguration" type="tns:com.s8.stack.arch.helium.ssl.SSL_WebConfiguration"/>
 	<xs:element name="SiliconAppConfiguration" type="tns:com.s8.arch.silicon.SiliconConfiguration"/>
 
 	<xs:complexType name="com.s8.web.carbon.build.pointers.bundles.JS_BundleBuilder">
@@ -46,12 +47,29 @@
 		<xs:sequence>
 		<xs:choice maxOccurs="unbounded" minOccurs="1">
 			<xs:element name="sources" type="tns:com.s8.web.carbon.build.sources.WebSources" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="root-local-path" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="module_module" type="tns:com.s8.web.carbon.build.sources.WebModule" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="module" type="tns:com.s8.web.carbon.build.sources.WebModule" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="sources_sources" type="tns:com.s8.web.carbon.build.sources.WebSources" minOccurs="0" maxOccurs="unbounded" />
 		</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="is-verbose" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:complexType name="com.s8.stack.arch.helium.rx.RxWebConfiguration">
+		<xs:sequence>
+		<xs:choice maxOccurs="unbounded" minOccurs="1">
+			<xs:element name="pool-capacity" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="isServer" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="backlog" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="port" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="socket_RxSocketConfiguration" type="tns:com.s8.stack.arch.helium.rx.RxSocketConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="host" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="RxSocketConfiguration" type="tns:com.s8.stack.arch.helium.rx.RxSocketConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="socket" type="tns:com.s8.stack.arch.helium.rx.RxSocketConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="isRxVerbose" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+		</xs:choice>
+		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="com.s8.arch.silicon.watch.WatchUnitConfig">
@@ -72,6 +90,9 @@
 	<xs:complexType name="com.s8.web.carbon.build.pointers.basics.CSS_Pointer" mixed="true">
 		<xs:attribute name="frag-length" type="xs:string"/>
 		<xs:attribute name="cache" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:complexType name="com.s8.web.carbon.build.sources.WebModule" mixed="true">
 	</xs:complexType>
 
 	<xs:complexType name="com.s8.web.carbon.build.pointers.folder.Folder">
@@ -104,9 +125,6 @@
 		<xs:attribute name="frag-length" type="xs:string"/>
 		<xs:attribute name="path" type="xs:string"/>
 		<xs:attribute name="cache" type="xs:string"/>
-	</xs:complexType>
-
-	<xs:complexType name="com.s8.web.carbon.build.sources.WebModule" mixed="true">
 	</xs:complexType>
 
 	<xs:complexType name="com.s8.arch.silicon.async.ProfileMappingBuilder" mixed="true">
@@ -153,8 +171,8 @@
 			<xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="host" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="RxSocketConfiguration" type="tns:com.s8.stack.arch.helium.rx.RxSocketConfiguration" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="isRxVerbose" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="socket" type="tns:com.s8.stack.arch.helium.rx.RxSocketConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="isRxVerbose" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="HPACK-isHuffmanEncoding" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 		</xs:choice>
 		</xs:sequence>
@@ -175,14 +193,13 @@
 		<xs:choice maxOccurs="unbounded" minOccurs="1">
 			<xs:element name="js-filter" type="tns:com.s8.web.carbon.build.filters.basics.JS_Filter" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="css" type="tns:com.s8.web.carbon.build.pointers.basics.CSS_Pointer" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="root-local-path" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="filter_svg-filter" type="tns:com.s8.web.carbon.build.filters.basics.SVG_Filter" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="filter_html-filter" type="tns:com.s8.web.carbon.build.filters.basics.HTML_Filter" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="builder_json" type="tns:com.s8.web.carbon.build.pointers.basics.JSON_Builder" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="html-filter" type="tns:com.s8.web.carbon.build.filters.basics.HTML_Filter" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="builder_json" type="tns:com.s8.web.carbon.build.pointers.basics.JSON_Builder" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="js" type="tns:com.s8.web.carbon.build.pointers.basics.JS_Builder" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="root-web-path" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="builder_html" type="tns:com.s8.web.carbon.build.pointers.basics.HTML_Pointer" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="root-web-path" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="filter_filter" type="tns:com.s8.web.carbon.build.filters.WebAssetFilter" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="css-filter" type="tns:com.s8.web.carbon.build.filters.basics.CSS_Filter" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="filter_js-filter" type="tns:com.s8.web.carbon.build.filters.basics.JS_Filter" minOccurs="0" maxOccurs="unbounded" />
@@ -201,9 +218,9 @@
 			<xs:element name="filter_png-filter" type="tns:com.s8.web.carbon.build.filters.basics.PNG_Filter" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="filter_css-filter" type="tns:com.s8.web.carbon.build.filters.basics.CSS_Filter" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="svg-filter" type="tns:com.s8.web.carbon.build.filters.basics.SVG_Filter" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="builder_basic" type="tns:com.s8.web.carbon.build.pointers.basics.BasicWebAssetPointer" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="x-filter" type="tns:com.s8.web.carbon.build.filters.basics.X_TextFilter" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="json-filter" type="tns:com.s8.web.carbon.build.filters.basics.JSON_Filter" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="builder_basic" type="tns:com.s8.web.carbon.build.pointers.basics.BasicWebAssetPointer" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="builder_js" type="tns:com.s8.web.carbon.build.pointers.basics.JS_Builder" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="svg" type="tns:com.s8.web.carbon.build.pointers.basics.SVG_Builder" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="png" type="tns:com.s8.web.carbon.build.pointers.basics.PNG_Builder" minOccurs="0" maxOccurs="unbounded" />
@@ -236,11 +253,11 @@
 			<xs:element name="T3-unit" type="tns:com.s8.arch.silicon.clock.ClockUnitConfig" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="T3UnitConfig" type="tns:com.s8.arch.silicon.clock.ClockUnitConfig" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="T2-unit_T2UnitConfig" type="tns:com.s8.arch.silicon.watch.WatchUnitConfig" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="T3-unit_T3UnitConfig" type="tns:com.s8.arch.silicon.clock.ClockUnitConfig" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="T2UnitConfig" type="tns:com.s8.arch.silicon.watch.WatchUnitConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T3-unit_T3UnitConfig" type="tns:com.s8.arch.silicon.clock.ClockUnitConfig" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="T1-unit_T1UnitConfig" type="tns:com.s8.arch.silicon.async.AsyncUnitConfig" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="T2-unit" type="tns:com.s8.arch.silicon.watch.WatchUnitConfig" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="T1-unit" type="tns:com.s8.arch.silicon.async.AsyncUnitConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T2-unit" type="tns:com.s8.arch.silicon.watch.WatchUnitConfig" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="T1UnitConfig" type="tns:com.s8.arch.silicon.async.AsyncUnitConfig" minOccurs="0" maxOccurs="unbounded" />
 		</xs:choice>
 		</xs:sequence>
@@ -263,6 +280,30 @@
 		</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="cache" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:complexType name="com.s8.stack.arch.helium.ssl.SSL_WebConfiguration">
+		<xs:sequence>
+		<xs:choice maxOccurs="unbounded" minOccurs="1">
+			<xs:element name="isServer" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="SSL-keystore_pathname" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="SSL-keystore_password" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="SSL-encryption_protocol" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="SSL-application_protocols" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="timeout" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="pool-capacity" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="SSL-maxPacketSize" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="backlog" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="port" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="socket_RxSocketConfiguration" type="tns:com.s8.stack.arch.helium.rx.RxSocketConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="SSL-isVerbose" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="host" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="RxSocketConfiguration" type="tns:com.s8.stack.arch.helium.rx.RxSocketConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="socket" type="tns:com.s8.stack.arch.helium.rx.RxSocketConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="isRxVerbose" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+		</xs:choice>
+		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="com.s8.web.carbon.build.pointers.basics.SVG_Builder" mixed="true">
@@ -323,17 +364,17 @@
 		</xs:sequence>
 	</xs:complexType>
 
+	<xs:complexType name="com.s8.web.carbon.build.pointers.WebAssetPointer">
+		<xs:attribute name="frag-length" type="xs:string"/>
+		<xs:attribute name="cache" type="xs:string"/>
+	</xs:complexType>
+
 	<xs:complexType name="com.s8.web.carbon.build.filters.basics.BasicWebAssetFilter">
 		<xs:sequence>
 		<xs:choice maxOccurs="unbounded" minOccurs="1">
 			<xs:element name="pattern" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 		</xs:choice>
 		</xs:sequence>
-		<xs:attribute name="frag-length" type="xs:string"/>
-		<xs:attribute name="cache" type="xs:string"/>
-	</xs:complexType>
-
-	<xs:complexType name="com.s8.web.carbon.build.pointers.WebAssetPointer">
 		<xs:attribute name="frag-length" type="xs:string"/>
 		<xs:attribute name="cache" type="xs:string"/>
 	</xs:complexType>
