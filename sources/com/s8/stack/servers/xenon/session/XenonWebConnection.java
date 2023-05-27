@@ -172,11 +172,11 @@ public class XenonWebConnection extends HTTP2_Connection {
 					XeUser user = (XeUser) object;
 					
 					isSuccessfullyLoggedIn = user.password.equals(password);
-				}
-				
-				/* log-in effectively */
-				if (isSuccessfullyLoggedIn) {
-					logIn(user);
+					
+					/* log-in effectively */
+					if (isSuccessfullyLoggedIn) {
+						logIn(user);
+					}
 				}
 				
 				LinkedByteOutflow outflow = new LinkedByteOutflow(64);
