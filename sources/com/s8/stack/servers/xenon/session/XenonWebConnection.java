@@ -165,17 +165,24 @@ public class XenonWebConnection extends HTTP2_Connection {
 
 		server.userDb.get(0, username, object -> {
 			try {
-				XeUser user = (XeUser) object;
-				LinkedBytes head = null;
+				
+				boolean isSuccessfullyLoggedIn = false;
+				if(object != null) {
 
-				boolean isSuccessfullyLoggedIn = user.password.equals(password);
+					XeUser user = (XeUser) object;
+					
+					isSuccessfullyLoggedIn = user.password.equals(password);
+				}
+				
+				/* log-in effectively */
 				if (isSuccessfullyLoggedIn) {
 					logIn(user);
 				}
+				
 				LinkedByteOutflow outflow = new LinkedByteOutflow(64);
 				outflow.putUInt8(isSuccessfullyLoggedIn ? XeResponseKeywords.SUCCESSFULLY_LOGGED_IN
 						: XeResponseKeywords.LOG_IN_FAILED);
-				head = outflow.getHead();
+				LinkedBytes head = outflow.getHead();
 				ng.pushAsyncTask(new RespondOk(response, head));
 
 			} catch (IOException e) {
