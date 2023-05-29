@@ -11,9 +11,6 @@ import com.s8.arch.fluor.S8Filter;
 import com.s8.arch.fluor.S8ResultProcessor;
 import com.s8.arch.fluor.S8User;
 import com.s8.arch.silicon.SiliconEngine;
-import com.s8.arch.silicon.async.AsyncTask;
-import com.s8.arch.silicon.async.MthProfile;
-import com.s8.io.bohr.neodymium.object.NdObject;
 import com.s8.io.bohr.neon.core.NeBranch;
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
 import com.s8.stack.servers.xenon.XeUser;
@@ -48,7 +45,9 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	/**
 	 * 
 	 */
-	private Deque<Operation> operations = new ArrayDeque<>();
+	private Deque<XeAsyncFlowOperation> operations = new ArrayDeque<>();
+	
+	private Deque<XeAsyncFlowOperation> sequenceBuilder = new ArrayDeque<>();
 
 
 	public XeAsyncFlow(XenonWebServer server,
@@ -78,19 +77,14 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	 * @param engine
 	 * @param operation
 	 */
-	protected void pushOperationLast(Operation operation) {
+	protected void pushOperationLast(XeAsyncFlowOperation operation) {
 
 		/* low contention synchronized section */
 		synchronized (lock) {
 
 			/* enqueue operation */
-			operations.addLast(operation);
-
+			sequenceBuilder.addLast(operation);
 		}
-
-		/* launch rolling */
-		roll(false);
-
 	}
 
 
@@ -99,21 +93,36 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	 * @param engine
 	 * @param operation
 	 */
-	protected void pushOperationFirst(Operation operation) {
+	protected void pushOperationFirst(XeAsyncFlowOperation operation) {
 
 		/* low contention synchronized section */
 		synchronized (lock) {
 
 			/* enqueue operation */
-			operations.addLast(operation);
-
+			sequenceBuilder.addLast(operation);
 		}
-
-		/* launch rolling */
-		roll(false);
-
 	}
 
+	
+
+
+	@Override
+	public void play() {
+		
+		synchronized (lock) {
+			
+			/* Empty sequence builder and append operations to the main deque */
+			while(!sequenceBuilder.isEmpty()) {
+				operations.addFirst(sequenceBuilder.pollLast());
+			}
+			
+		}
+		
+		/* launch rolling */
+		roll(false);
+	}
+	
+	
 
 	/**
 	 * 
@@ -141,11 +150,10 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 		synchronized (lock) {
 
 			if(!isTerminated && isActive == isContinued) {
-
-
+				
 				if(!operations.isEmpty()) {
 					isActive = true;
-					Operation operation = operations.poll();					
+					XeAsyncFlowOperation operation = operations.poll();					
 
 					ng.pushAsyncTask(operation.createTask());
 					/*
@@ -166,47 +174,9 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 
-
-
 	@Override
-	public S8AsyncFlow prior(int profile, S8CodeBlock runnable) {
-		pushOperationFirst(new Operation() {
-			public @Override AsyncTask createTask() { 
-				return new AsyncTask() {
-					public @Override void run() {
-						runnable.run();
-						roll(true);
-					}
-					public @Override MthProfile profile() { return MthProfile.FX1; }
-					public @Override String describe() { return "Committing"; }
-				};
-			}
-		});
-		return this;
-	}
-
-
-
-
-
-
-
-
-
-	@Override
-	public S8AsyncFlow then(int profile, S8CodeBlock runnable) {
-		pushOperationLast(new Operation() {
-			public @Override AsyncTask createTask() { 
-				return new AsyncTask() {
-					public @Override void run() {
-						runnable.run();
-						roll(true);
-					}
-					public @Override MthProfile profile() { return MthProfile.FX1; }
-					public @Override String describe() { return "Committing"; }
-				};
-			}
-		});
+	public S8AsyncFlow runBlock(int profile, S8CodeBlock runnable) {
+		pushOperationLast(new RunBlockOp(server, this, runnable));
 		return this;
 	}
 
@@ -223,52 +193,22 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public S8User getMe() {
 		return user;
 	}
+	
+	
+	//private static class Operation
+	
 
 	@Override
-	public void getUser(String username, S8ResultProcessor<S8User> onRetrieved, S8ExceptionCatcher onFailed) {
-		pushOperationLast(new Operation() {
-			public @Override AsyncTask createTask() { 
-				return new AsyncTask() {
-					public @Override void run() {
-						server.userDb.get(0L, username, 
-								user -> {
-									onRetrieved.run((S8User) user);
-									roll(true);
-								},
-								exception -> {
-									onFailed.run(exception); 
-									roll(true);
-								});
-					}
-					public @Override MthProfile profile() { return MthProfile.FX1; }
-					public @Override String describe() { return "Committing"; }
-				};
-			}
-		});
+	public S8AsyncFlow getUser(String username, S8ResultProcessor<S8User> onRetrieved, S8ExceptionCatcher onFailed) {
+		pushOperationLast(new GetUserOp(server, this, username, onRetrieved, onFailed));
+		return this;
 	}
 
 
 	@Override
-	public void scanUsers(S8Filter<S8User> filter, S8ResultProcessor<List<S8User>> onSelected, S8ExceptionCatcher onFailed) {
-		pushOperationLast(new Operation() {
-			public @Override AsyncTask createTask() { 
-				return new AsyncTask() {
-					public @Override void run() {
-						server.userDb.select(0L, filter, 
-								selection -> {
-									onSelected.run(selection);
-									roll(true);
-								},
-								exception -> {
-									onFailed.run(exception); 
-									roll(true);
-								});
-					}
-					public @Override MthProfile profile() { return MthProfile.FX1; }
-					public @Override String describe() { return "Committing"; }
-				};
-			}
-		});
+	public S8AsyncFlow selectUsers(S8Filter<S8User> filter, S8ResultProcessor<List<S8User>> onSelected, S8ExceptionCatcher onFailed) {
+		pushOperationLast(new SelectUsersOp(server, this, filter, onSelected, onFailed));
+		return this;
 	}
 
 
@@ -279,144 +219,58 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 	@Override
-	public void accessMySpace(S8ResultProcessor<Object[]> onAccessed, S8ExceptionCatcher onException) {
-		accessSpace(getMySpaceId(), onAccessed, onException);
+	public S8AsyncFlow accessMySpace(S8ResultProcessor<Object[]> onAccessed, S8ExceptionCatcher onException) {
+		return accessSpace(getMySpaceId(), onAccessed, onException);
 	}
 
 
 	@Override
-	public void exposeMySpace(Object[] exposure, S8ResultProcessor<Long> onRebased, S8ExceptionCatcher onException) {
-		exposeSpace(getMySpaceId(), exposure, onRebased, onException);
+	public S8AsyncFlow exposeMySpace(Object[] exposure, S8ResultProcessor<Long> onRebased, S8ExceptionCatcher onException) {
+		return exposeSpace(getMySpaceId(), exposure, onRebased, onException);
 	}
 
 
 	@Override
-	public void accessSpace(String spaceId, S8ResultProcessor<Object[]> onAccessed, S8ExceptionCatcher onException) {
-		pushOperationLast(new Operation() {
-			public @Override AsyncTask createTask() { 
-				return new AsyncTask() {
-					public @Override void run() {
-						server.spaceDb.accessExposure(0L, spaceId, 
-								exposure -> {
-									onAccessed.run(exposure);
-									roll(true);
-								},
-								exception -> {
-									onException.run(exception);
-									roll(true);
-								}); 
-					}
-					public @Override MthProfile profile() { return MthProfile.FX1; }
-					public @Override String describe() { return "Committing"; }
-				};
-			}
-		});
+	public S8AsyncFlow accessSpace(String spaceId, S8ResultProcessor<Object[]> onAccessed, S8ExceptionCatcher onException) {
+		pushOperationLast(new AccessSpaceOp(server, this, spaceId, onAccessed, onException));
+		return this;
 	}
 
 
 	@Override
-	public void exposeSpace(String spaceId, Object[] exposure, S8ResultProcessor<Long> onRebased,
+	public S8AsyncFlow exposeSpace(String spaceId, Object[] exposure, S8ResultProcessor<Long> onRebased,
 			S8ExceptionCatcher onException) {
-		pushOperationLast(new Operation() {
-			public @Override AsyncTask createTask() { 
-				return new AsyncTask() {
-					public @Override void run() {
-						server.spaceDb.exposeObjects(0, spaceId, exposure, 
-								version -> {
-									onRebased.run(version);
-									roll(true);
-								},
-								exception -> {
-									onException.run(exception);
-									roll(true);
-								});
-					}
-					public @Override MthProfile profile() { return MthProfile.FX1; }
-					public @Override String describe() { return "Committing"; }
-				};
-			}
-		});
-
+		pushOperationLast(new ExposeSpaceOp(server, this, spaceId, exposure, onRebased, onException));
+		return this;
 	}
 
 
 	@Override
-	public void commit(String repositoryAddress, String branchId, Object[] objects, 
+	public S8AsyncFlow commit(String repositoryAddress, String branchId, Object[] objects, 
 			S8ResultProcessor<Long> onCommitted,
 			S8ExceptionCatcher onException) {
-		pushOperationLast(new Operation() {
-			public @Override AsyncTask createTask() { 
-				return new AsyncTask() {
-					public @Override void run() {
-						server.repoDb.commit(0L, repositoryAddress, branchId, objects, 
-								version -> { 
-									onCommitted.run(version); 
-									roll(true);
-								}, 
-								exception -> {
-									onException.run(exception);
-									roll(true);
-								});
-					}
-					public @Override MthProfile profile() { return MthProfile.FX1; }
-					public @Override String describe() { return "Committing"; }
-				};
-			}
-		});
+		pushOperationLast(new CommitOp(server, this, repositoryAddress, branchId, objects, onCommitted, onException));
+		return this;
 	}
 
 
 	@Override
-	public void cloneHead(String repositoryAddress, String branchId, S8ResultProcessor<Object[]> onCloned,
+	public S8AsyncFlow cloneHead(String repositoryAddress, String branchId, 
+			S8ResultProcessor<Object[]> onCloned,
 			S8ExceptionCatcher onException) {
-		pushOperationLast(new Operation() {
-			public @Override AsyncTask createTask() { 
-				return new AsyncTask() {
-					public @Override void run() {
-						server.repoDb.cloneHead(0L, repositoryAddress, branchId, 
-								objects -> { 
-									onCloned.run((NdObject[]) objects); 
-									roll(true);
-								}, 
-								exception -> {
-									onException.run(exception);
-									roll(true);
-								});
-					}
-					public @Override MthProfile profile() { return MthProfile.FX1; }
-					public @Override String describe() { return "Committing"; }
-				};
-			}
-		});
-
+		pushOperationLast(new CloneHeadOp(server, this, repositoryAddress, branchId, onCloned, onException));
+		return this;
 	}
 
 
 
 
 	@Override
-	public void cloneVersion(String repositoryAddress, String branchId, long version,
+	public S8AsyncFlow cloneVersion(String repositoryAddress, String branchId, long version,
 			S8ResultProcessor<Object[]> onCloned, 
 			S8ExceptionCatcher onException) {
-		pushOperationLast(new Operation() {
-			public @Override AsyncTask createTask() { 
-				return new AsyncTask() {
-					public @Override void run() {
-						server.repoDb.cloneVersion(0L, repositoryAddress, branchId, version,  
-								objects -> { 
-									onCloned.run((NdObject[]) objects); 
-									roll(true);
-								}, 
-								exception -> {
-									onException.run(exception);
-									roll(true);
-								});
-					}
-					public @Override MthProfile profile() { return MthProfile.FX1; }
-					public @Override String describe() { return "Committing"; }
-				};
-			}
-		});
+		pushOperationLast(new CloneVersionOp(server, this, repositoryAddress, branchId, version, onCloned, onException));
+		return this;
 	}
 
 
@@ -424,17 +278,22 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public void send() {
-		pushOperationLast(new Operation() {
-			public @Override AsyncTask createTask() { 
-				return new SendingTask(XeAsyncFlow.this, branch, response);
-			}
-		});
+		pushOperationLast(new SendOp(server, this, branch, response));
+		play();
 	}
 
 
 	public void terminate() {
 		isTerminated = true;
 	}
+
+
+
+
+
+
+
+
 
 
 
