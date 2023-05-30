@@ -6,6 +6,7 @@ import java.nio.file.Path;
 
 import com.s8.arch.magnesium.databases.note.NoteMgDatabase;
 import com.s8.arch.magnesium.databases.repo.store.RepoMgDatabase;
+import com.s8.arch.magnesium.databases.space.store.MgSpaceInitializer;
 import com.s8.arch.magnesium.databases.space.store.SpaceMgDatabase;
 import com.s8.arch.magnesium.service.MgConfiguration;
 import com.s8.arch.silicon.SiliconEngine;
@@ -30,13 +31,16 @@ public class XenonWebServer extends HTTP2_Server {
 
 
 
-	public static XenonWebServer build(XeCodebase codebase, XeBoot boot, String configPathname) throws Exception {
+	public static XenonWebServer build(XeCodebase codebase, 
+			MgSpaceInitializer spaceInitializer,
+			XeBoot boot, 
+			String configPathname) throws Exception {
 		// build context
 		XML_Codebase lexicon = XML_Codebase.from(XenonConfiguration.class);
 
 		XenonConfiguration configuration = XenonConfiguration.load(lexicon, configPathname);
 
-		return new XenonWebServer(codebase, boot, lexicon, configuration);
+		return new XenonWebServer(codebase, spaceInitializer, boot, lexicon, configuration);
 	}
 
 
@@ -46,6 +50,9 @@ public class XenonWebServer extends HTTP2_Server {
 	public final SiliconEngine siliconEngine;
 
 	public final XeCodebase codebase;
+	
+	
+	public final MgSpaceInitializer spaceInitializer;
 	
 	public final XeBoot boot;
 
@@ -80,6 +87,7 @@ public class XenonWebServer extends HTTP2_Server {
 	 */
 	public XenonWebServer(
 			XeCodebase codebase,
+			MgSpaceInitializer spaceInitializer,
 			XeBoot boot,
 			XML_Codebase lexicon,
 			XenonConfiguration configuration) throws Exception {
@@ -87,6 +95,7 @@ public class XenonWebServer extends HTTP2_Server {
 
 
 		this.codebase = codebase;
+		this.spaceInitializer = spaceInitializer;
 		this.boot = boot;
 
 
@@ -117,7 +126,7 @@ public class XenonWebServer extends HTTP2_Server {
 		if(magnesium.spaceDbConfigPathname == null) {
 			throw new IOException("A path must be defined for the space db");
 		}
-		spaceDb = new SpaceMgDatabase(siliconEngine, codebase.space, Path.of(magnesium.spaceDbConfigPathname));
+		spaceDb = new SpaceMgDatabase(siliconEngine, codebase.space, Path.of(magnesium.spaceDbConfigPathname), spaceInitializer);
 		
 		/* repository database */
 		if(magnesium.repoDbConfigPathname == null) {

@@ -1,29 +1,31 @@
 package com.s8.stack.servers.xenon.flow;
 
 import com.s8.arch.fluor.S8OutputProcessor;
-import com.s8.arch.fluor.outputs.GetUserS8AsyncOutput;
+import com.s8.arch.fluor.S8User;
+import com.s8.arch.fluor.outputs.PutUserS8AsyncOutput;
 import com.s8.arch.silicon.async.AsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
+import com.s8.io.bohr.beryllium.object.BeObject;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
-class GetUserOp extends XeAsyncFlowOperation {
+class PutUserOp extends XeAsyncFlowOperation {
 
 
-	public final String username;
+	public final S8User user;
 
-	public final S8OutputProcessor<GetUserS8AsyncOutput> onRetrieved;
+	public final S8OutputProcessor<PutUserS8AsyncOutput> onInserted;
 
 	public final long options;
 
 
-	public GetUserOp(XenonWebServer server, 
+	public PutUserOp(XenonWebServer server, 
 			XeAsyncFlow flow, 
-			String username, 
-			S8OutputProcessor<GetUserS8AsyncOutput> onRetrieved,
+			S8User user, 
+			S8OutputProcessor<PutUserS8AsyncOutput> onInserted,
 			long options) {
 		super(server, flow);
-		this.username = username;
-		this.onRetrieved = onRetrieved;
+		this.user = user;
+		this.onInserted = onInserted;
 		this.options = options;
 	}
 
@@ -36,9 +38,10 @@ class GetUserOp extends XeAsyncFlowOperation {
 
 			@Override
 			public void run() {
-				server.userDb.get(0L, username, 
+				String id = user.getUsername();
+				server.userDb.put(0L, id, (BeObject) user, 
 						output -> {
-							onRetrieved.run(output);
+							onInserted.run(output);
 							flow.roll(true);
 						}, 
 						options);

@@ -163,13 +163,13 @@ public class XenonWebConnection extends HTTP2_Connection {
 		String username = inflow.getStringUTF8();
 		String password = inflow.getStringUTF8();
 
-		server.userDb.get(0, username, object -> {
+		server.userDb.get(0, username, output -> {
 			try {
 				
 				boolean isSuccessfullyLoggedIn = false;
-				if(object != null) {
+				if(output.isUserDefined) {
 
-					XeUser user = (XeUser) object;
+					XeUser user = (XeUser) output.user;
 					
 					isSuccessfullyLoggedIn = user.password.equals(password);
 					
@@ -190,10 +190,7 @@ public class XenonWebConnection extends HTTP2_Connection {
 				ng.pushAsyncTask(new SendError(response, HTTP2_Status.Locked, "Error"));
 
 			}
-		}, e -> {
-			e.printStackTrace();
-			ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error"));
-		});
+		}, 0x0L);
 	}
 
 	private void logIn(XeUser user) {

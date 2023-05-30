@@ -1,10 +1,9 @@
 package com.s8.stack.servers.xenon.flow;
 
-import com.s8.arch.fluor.S8ExceptionCatcher;
-import com.s8.arch.fluor.S8ResultProcessor;
+import com.s8.arch.fluor.S8OutputProcessor;
+import com.s8.arch.fluor.outputs.BranchExposureS8AsyncOutput;
 import com.s8.arch.silicon.async.AsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
-import com.s8.io.bohr.neodymium.object.NdObject;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
 /**
@@ -12,7 +11,7 @@ import com.s8.stack.servers.xenon.XenonWebServer;
  * @author pierreconvert
  *
  */
-public class CloneHeadOp extends XeAsyncFlowOperation {
+public class CloneBranchHeadOp extends XeAsyncFlowOperation {
 
 
 	/**
@@ -30,13 +29,10 @@ public class CloneHeadOp extends XeAsyncFlowOperation {
 	/**
 	 * 
 	 */
-	public final S8ResultProcessor<Object[]> onCloned;
+	public final S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned;
 
 	
-	/**
-	 * 
-	 */
-	public final S8ExceptionCatcher onException;
+	public final long options;
 	
 
 
@@ -49,17 +45,17 @@ public class CloneHeadOp extends XeAsyncFlowOperation {
 	 * @param onCloned
 	 * @param onException
 	 */
-	public CloneHeadOp(XenonWebServer server, 
+	public CloneBranchHeadOp(XenonWebServer server, 
 			XeAsyncFlow flow, 
 			String repositoryAddress, 
 			String branchId,
-			S8ResultProcessor<Object[]> onCloned, 
-			S8ExceptionCatcher onException) {
+			S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned, 
+			long options) {
 		super(server, flow);
 		this.repositoryAddress = repositoryAddress;
 		this.branchId = branchId;
 		this.onCloned = onCloned;
-		this.onException = onException;
+		this.options = options;
 	}
 
 
@@ -73,15 +69,12 @@ public class CloneHeadOp extends XeAsyncFlowOperation {
 			
 			@Override
 			public void run() {
-				server.repoDb.cloneHead(0L, repositoryAddress, branchId, 
-						objects -> { 
-							onCloned.run((NdObject[]) objects); 
+				server.repoDb.cloneBranchHead(0L, repositoryAddress, branchId, 
+						output -> { 
+							onCloned.run(output); 
 							flow.roll(true);
 						}, 
-						exception -> {
-							onException.run(exception);
-							flow.roll(true);
-						});
+						options);
 			}
 			
 			@Override

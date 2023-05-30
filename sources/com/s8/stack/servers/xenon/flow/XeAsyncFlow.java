@@ -2,14 +2,21 @@ package com.s8.stack.servers.xenon.flow;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.List;
 
 import com.s8.arch.fluor.S8AsyncFlow;
 import com.s8.arch.fluor.S8CodeBlock;
-import com.s8.arch.fluor.S8ExceptionCatcher;
 import com.s8.arch.fluor.S8Filter;
-import com.s8.arch.fluor.S8ResultProcessor;
+import com.s8.arch.fluor.S8OutputProcessor;
 import com.s8.arch.fluor.S8User;
+import com.s8.arch.fluor.outputs.BranchCreationS8AsyncOutput;
+import com.s8.arch.fluor.outputs.BranchExposureS8AsyncOutput;
+import com.s8.arch.fluor.outputs.BranchVersionS8AsyncOutput;
+import com.s8.arch.fluor.outputs.GetUserS8AsyncOutput;
+import com.s8.arch.fluor.outputs.ObjectsListS8AsyncOutput;
+import com.s8.arch.fluor.outputs.PutUserS8AsyncOutput;
+import com.s8.arch.fluor.outputs.RepoCreationS8AsyncOutput;
+import com.s8.arch.fluor.outputs.SpaceExposureS8AsyncOutput;
+import com.s8.arch.fluor.outputs.SpaceVersionS8AsyncOutput;
 import com.s8.arch.silicon.SiliconEngine;
 import com.s8.io.bohr.neon.core.NeBranch;
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
@@ -199,15 +206,23 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	
 
 	@Override
-	public S8AsyncFlow getUser(String username, S8ResultProcessor<S8User> onRetrieved, S8ExceptionCatcher onFailed) {
-		pushOperationLast(new GetUserOp(server, this, username, onRetrieved, onFailed));
+	public S8AsyncFlow getUser(String username, S8OutputProcessor<GetUserS8AsyncOutput> onRetrieved, long options) {
+		pushOperationLast(new GetUserOp(server, this, username, onRetrieved, options));
+		return this;
+	}
+	
+	@Override
+	public S8AsyncFlow putUser(S8User user, S8OutputProcessor<PutUserS8AsyncOutput> onInserted, long options) {
+		pushOperationLast(new PutUserOp(server, this, user, onInserted, options));
 		return this;
 	}
 
 
 	@Override
-	public S8AsyncFlow selectUsers(S8Filter<S8User> filter, S8ResultProcessor<List<S8User>> onSelected, S8ExceptionCatcher onFailed) {
-		pushOperationLast(new SelectUsersOp(server, this, filter, onSelected, onFailed));
+	public S8AsyncFlow selectUsers(S8Filter<S8User> filter, 
+			S8OutputProcessor<ObjectsListS8AsyncOutput<S8User>> onSelected, 
+			long options) {
+		pushOperationLast(new SelectUsersOp(server, this, filter, onSelected, options));
 		return this;
 	}
 
@@ -216,49 +231,68 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	/* <process-lithum> */
 
 
-
-
 	@Override
-	public S8AsyncFlow accessMySpace(S8ResultProcessor<Object[]> onAccessed, S8ExceptionCatcher onException) {
-		return accessSpace(getMySpaceId(), onAccessed, onException);
+	public S8AsyncFlow accessSpace(String spaceId, S8OutputProcessor<SpaceExposureS8AsyncOutput> onAccessed, long options) {
+		pushOperationLast(new AccessSpaceOp(server, this, spaceId, onAccessed, options));
+		return this;
 	}
 
 
-	@Override
-	public S8AsyncFlow exposeMySpace(Object[] exposure, S8ResultProcessor<Long> onRebased, S8ExceptionCatcher onException) {
-		return exposeSpace(getMySpaceId(), exposure, onRebased, onException);
-	}
-
 
 	@Override
-	public S8AsyncFlow accessSpace(String spaceId, S8ResultProcessor<Object[]> onAccessed, S8ExceptionCatcher onException) {
-		pushOperationLast(new AccessSpaceOp(server, this, spaceId, onAccessed, onException));
+	public S8AsyncFlow accessMySpace(S8OutputProcessor<SpaceExposureS8AsyncOutput> onAccessed, long options) {
+		pushOperationLast(new AccessSpaceOp(server, this, getMySpaceId(), onAccessed, options));
 		return this;
 	}
 
 
 	@Override
-	public S8AsyncFlow exposeSpace(String spaceId, Object[] exposure, S8ResultProcessor<Long> onRebased,
-			S8ExceptionCatcher onException) {
-		pushOperationLast(new ExposeSpaceOp(server, this, spaceId, exposure, onRebased, onException));
+	public S8AsyncFlow exposeSpace(String spaceId, Object[] exposure, S8OutputProcessor<SpaceVersionS8AsyncOutput> onRebased,
+			long options) {
+		pushOperationLast(new ExposeSpaceOp(server, this, spaceId, exposure, onRebased, options));
 		return this;
 	}
+	
+
+	@Override
+	public S8AsyncFlow exposeMySpace(Object[] exposure, S8OutputProcessor<SpaceVersionS8AsyncOutput> onRebased, long options) {
+		pushOperationLast(new ExposeSpaceOp(server, this, getMySpaceId(), exposure, onRebased, options));
+		return this;
+	}
+
+
+
+	@Override
+	public S8AsyncFlow createRepository(String repositoryAddress,
+			S8OutputProcessor<RepoCreationS8AsyncOutput> onCreated, long options) {
+		pushOperationLast(new CreateRepoOp(server, this, repositoryAddress, onCreated, options));
+		return this;
+	}
+
+
+	@Override
+	public S8AsyncFlow createBranch(String repositoryAddress, String branchId,
+			S8OutputProcessor<BranchCreationS8AsyncOutput> onCreated, long options) {
+		pushOperationLast(new CreateBranchOp(server, this, repositoryAddress, branchId, onCreated, options));
+		return this;
+	}
+
 
 
 	@Override
 	public S8AsyncFlow commit(String repositoryAddress, String branchId, Object[] objects, 
-			S8ResultProcessor<Long> onCommitted,
-			S8ExceptionCatcher onException) {
-		pushOperationLast(new CommitOp(server, this, repositoryAddress, branchId, objects, onCommitted, onException));
+			S8OutputProcessor<BranchVersionS8AsyncOutput> onCommitted,
+			long options) {
+		pushOperationLast(new CommitBranchOp(server, this, repositoryAddress, branchId, objects, onCommitted, options));
 		return this;
 	}
 
 
 	@Override
 	public S8AsyncFlow cloneHead(String repositoryAddress, String branchId, 
-			S8ResultProcessor<Object[]> onCloned,
-			S8ExceptionCatcher onException) {
-		pushOperationLast(new CloneHeadOp(server, this, repositoryAddress, branchId, onCloned, onException));
+			S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned,
+			long options) {
+		pushOperationLast(new CloneBranchHeadOp(server, this, repositoryAddress, branchId, onCloned, options));
 		return this;
 	}
 
@@ -267,9 +301,9 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow cloneVersion(String repositoryAddress, String branchId, long version,
-			S8ResultProcessor<Object[]> onCloned, 
-			S8ExceptionCatcher onException) {
-		pushOperationLast(new CloneVersionOp(server, this, repositoryAddress, branchId, version, onCloned, onException));
+			S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned, 
+			long options) {
+		pushOperationLast(new CloneVersionOp(server, this, repositoryAddress, branchId, version, onCloned, options));
 		return this;
 	}
 
@@ -286,32 +320,6 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public void terminate() {
 		isTerminated = true;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

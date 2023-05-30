@@ -1,19 +1,12 @@
 package com.s8.stack.servers.xenon.flow;
 
 import com.s8.arch.fluor.S8OutputProcessor;
-import com.s8.arch.fluor.outputs.BranchExposureS8AsyncOutput;
+import com.s8.arch.fluor.outputs.BranchVersionS8AsyncOutput;
 import com.s8.arch.silicon.async.AsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
-
-/**
- * 
- * @author pierreconvert
- *
- */
-public class CloneVersionOp extends XeAsyncFlowOperation {
-
+public class CommitBranchOp extends XeAsyncFlowOperation {
 
 	public final String repositoryAddress;
 
@@ -21,62 +14,51 @@ public class CloneVersionOp extends XeAsyncFlowOperation {
 	public final String branchId;
 
 
-	public final long version;
+	public final Object[] objects;
 
-
-	public final S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned;
-
-	
-	public final long options;
-	
-	
-	
 
 	/**
 	 * 
-	 * @param server
-	 * @param flow
-	 * @param repositoryAddress
-	 * @param branchId
-	 * @param version
-	 * @param onCloned
-	 * @param onException
 	 */
-	public CloneVersionOp(XenonWebServer server, 
+	public final S8OutputProcessor<BranchVersionS8AsyncOutput> onCommitted;
+
+	/**
+	 * 
+	 */
+	public final long options;
+
+
+
+	public CommitBranchOp(XenonWebServer server, 
 			XeAsyncFlow flow, 
 			String repositoryAddress, 
 			String branchId,
-			long version, 
-			S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned, 
+			Object[] objects, 
+			S8OutputProcessor<BranchVersionS8AsyncOutput> onCommitted, 
 			long options) {
-		
 		super(server, flow);
 		this.repositoryAddress = repositoryAddress;
 		this.branchId = branchId;
-		this.version = version;
-		this.onCloned = onCloned;
+		this.objects = objects;
+		this.onCommitted = onCommitted;
 		this.options = options;
 	}
 
 
 
 
-
-
 	@Override
 	public AsyncTask createTask() { 
-		
-		
 		return new AsyncTask() {
+			
 			
 			@Override
 			public void run() {
-				server.repoDb.cloneBranchVersion(0L, repositoryAddress, branchId, version,  
+				server.repoDb.commitBranch(0L, repositoryAddress, branchId, objects, 
 						output -> { 
-							onCloned.run(output); 
+							onCommitted.run(output); 
 							flow.roll(true);
-						},
-						options);
+						}, options);
 			}
 			
 			@Override
@@ -86,5 +68,4 @@ public class CloneVersionOp extends XeAsyncFlowOperation {
 			public String describe() { return "Committing"; }
 		};
 	}
-
 }

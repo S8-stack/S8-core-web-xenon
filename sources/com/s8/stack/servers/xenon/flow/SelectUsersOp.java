@@ -1,11 +1,9 @@
 package com.s8.stack.servers.xenon.flow;
 
-import java.util.List;
-
-import com.s8.arch.fluor.S8ExceptionCatcher;
 import com.s8.arch.fluor.S8Filter;
-import com.s8.arch.fluor.S8ResultProcessor;
+import com.s8.arch.fluor.S8OutputProcessor;
 import com.s8.arch.fluor.S8User;
+import com.s8.arch.fluor.outputs.ObjectsListS8AsyncOutput;
 import com.s8.arch.silicon.async.AsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.stack.servers.xenon.XenonWebServer;
@@ -27,14 +25,9 @@ public class SelectUsersOp extends XeAsyncFlowOperation {
 	/**
 	 * 
 	 */
-	public final S8ResultProcessor<List<S8User>> onSelected;
+	public final S8OutputProcessor<ObjectsListS8AsyncOutput<S8User>> onSelected;
 
-	
-	/**
-	 * 
-	 */
-	public final S8ExceptionCatcher onFailed;
-
+	public final long options;
 
 	/**
 	 * 
@@ -47,12 +40,12 @@ public class SelectUsersOp extends XeAsyncFlowOperation {
 	public SelectUsersOp(XenonWebServer server, 
 			XeAsyncFlow flow, 
 			S8Filter<S8User> filter,
-			S8ResultProcessor<List<S8User>> onSelected, 
-			S8ExceptionCatcher onFailed) {
+			S8OutputProcessor<ObjectsListS8AsyncOutput<S8User>> onSelected, 
+			long options) {
 		super(server, flow);
 		this.filter = filter;
 		this.onSelected = onSelected;
-		this.onFailed = onFailed;
+		this.options = options;
 	}
 
 
@@ -67,14 +60,11 @@ public class SelectUsersOp extends XeAsyncFlowOperation {
 			@Override
 			public void run() {
 				server.userDb.select(0L, filter, 
-						selection -> {
-							onSelected.run(selection);
+						output -> {
+							onSelected.run(output);
 							flow.roll(true);
 						},
-						exception -> {
-							onFailed.run(exception); 
-							flow.roll(true);
-						});
+						options);
 			}
 
 			@Override

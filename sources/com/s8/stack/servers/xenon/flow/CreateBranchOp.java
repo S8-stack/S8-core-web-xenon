@@ -1,12 +1,12 @@
 package com.s8.stack.servers.xenon.flow;
 
-import com.s8.arch.fluor.S8ExceptionCatcher;
-import com.s8.arch.fluor.S8ResultProcessor;
+import com.s8.arch.fluor.S8OutputProcessor;
+import com.s8.arch.fluor.outputs.BranchCreationS8AsyncOutput;
 import com.s8.arch.silicon.async.AsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
-public class CommitOp extends XeAsyncFlowOperation {
+public class CreateBranchOp extends XeAsyncFlowOperation {
 
 	public final String repositoryAddress;
 
@@ -14,32 +14,29 @@ public class CommitOp extends XeAsyncFlowOperation {
 	public final String branchId;
 
 
-	public final Object[] objects;
+	/**
+	 * 
+	 */
+	public final S8OutputProcessor<BranchCreationS8AsyncOutput> onCommitted;
+
+	/**
+	 * 
+	 */
+	public final long options;
 
 
-	public final S8ResultProcessor<Long> onCommitted;
 
-
-	public final S8ExceptionCatcher onException;
-
-
-
-
-
-
-	public CommitOp(XenonWebServer server, 
+	public CreateBranchOp(XenonWebServer server, 
 			XeAsyncFlow flow, 
 			String repositoryAddress, 
 			String branchId,
-			Object[] objects, 
-			S8ResultProcessor<Long> onCommitted, 
-			S8ExceptionCatcher onException) {
+			S8OutputProcessor<BranchCreationS8AsyncOutput> onCommitted, 
+			long options) {
 		super(server, flow);
 		this.repositoryAddress = repositoryAddress;
 		this.branchId = branchId;
-		this.objects = objects;
 		this.onCommitted = onCommitted;
-		this.onException = onException;
+		this.options = options;
 	}
 
 
@@ -52,15 +49,11 @@ public class CommitOp extends XeAsyncFlowOperation {
 			
 			@Override
 			public void run() {
-				server.repoDb.commit(0L, repositoryAddress, branchId, objects, 
-						version -> { 
-							onCommitted.run(version); 
+				server.repoDb.createBranch(0L, repositoryAddress, branchId, 
+						output -> { 
+							onCommitted.run(output); 
 							flow.roll(true);
-						}, 
-						exception -> {
-							onException.run(exception);
-							flow.roll(true);
-						});
+						}, options);
 			}
 			
 			@Override

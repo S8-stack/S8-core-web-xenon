@@ -1,34 +1,36 @@
 package com.s8.stack.servers.xenon.flow;
 
 import com.s8.arch.fluor.S8OutputProcessor;
-import com.s8.arch.fluor.outputs.SpaceVersionS8AsyncOutput;
+import com.s8.arch.fluor.outputs.RepoCreationS8AsyncOutput;
 import com.s8.arch.silicon.async.AsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
-public class ExposeSpaceOp extends XeAsyncFlowOperation {
+public class CreateRepoOp extends XeAsyncFlowOperation {
+
+	public final String repositoryAddress;
 
 
-	public final String spaceId;
+	/**
+	 * 
+	 */
+	public final S8OutputProcessor<RepoCreationS8AsyncOutput> onCommitted;
 
-	public final Object[] exposure;
-
-	public final S8OutputProcessor<SpaceVersionS8AsyncOutput> onRebased;
-
+	/**
+	 * 
+	 */
 	public final long options;
-	
-	
 
-	public ExposeSpaceOp(XenonWebServer server, 
+
+
+	public CreateRepoOp(XenonWebServer server, 
 			XeAsyncFlow flow, 
-			String spaceId, 
-			Object[] exposure,
-			S8OutputProcessor<SpaceVersionS8AsyncOutput> onRebased, 
+			String repositoryAddress, 
+			S8OutputProcessor<RepoCreationS8AsyncOutput> onCommitted, 
 			long options) {
 		super(server, flow);
-		this.spaceId = spaceId;
-		this.exposure = exposure;
-		this.onRebased = onRebased;
+		this.repositoryAddress = repositoryAddress;
+		this.onCommitted = onCommitted;
 		this.options = options;
 	}
 
@@ -37,17 +39,16 @@ public class ExposeSpaceOp extends XeAsyncFlowOperation {
 
 	@Override
 	public AsyncTask createTask() { 
-		
 		return new AsyncTask() {
+			
 			
 			@Override
 			public void run() {
-				server.spaceDb.exposeObjects(0, spaceId, exposure, 
-						output -> {
-							onRebased.run(output);
+				server.repoDb.createRepository(0L, repositoryAddress, 
+						output -> { 
+							onCommitted.run(output); 
 							flow.roll(true);
-						},
-						options);
+						}, options);
 			}
 			
 			@Override
@@ -57,5 +58,4 @@ public class ExposeSpaceOp extends XeAsyncFlowOperation {
 			public String describe() { return "Committing"; }
 		};
 	}
-
 }
