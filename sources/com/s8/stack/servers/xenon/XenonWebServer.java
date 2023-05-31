@@ -6,7 +6,6 @@ import java.nio.file.Path;
 
 import com.s8.arch.magnesium.databases.note.NoteMgDatabase;
 import com.s8.arch.magnesium.databases.repo.store.RepoMgDatabase;
-import com.s8.arch.magnesium.databases.space.store.MgSpaceInitializer;
 import com.s8.arch.magnesium.databases.space.store.SpaceMgDatabase;
 import com.s8.arch.magnesium.service.MgConfiguration;
 import com.s8.arch.silicon.SiliconEngine;
@@ -32,7 +31,6 @@ public class XenonWebServer extends HTTP2_Server {
 
 
 	public static XenonWebServer build(XeCodebase codebase, 
-			MgSpaceInitializer spaceInitializer,
 			XeBoot boot, 
 			String configPathname) throws Exception {
 		// build context
@@ -40,7 +38,7 @@ public class XenonWebServer extends HTTP2_Server {
 
 		XenonConfiguration configuration = XenonConfiguration.load(lexicon, configPathname);
 
-		return new XenonWebServer(codebase, spaceInitializer, boot, lexicon, configuration);
+		return new XenonWebServer(codebase, boot, lexicon, configuration);
 	}
 
 
@@ -50,9 +48,6 @@ public class XenonWebServer extends HTTP2_Server {
 	public final SiliconEngine siliconEngine;
 
 	public final XeCodebase codebase;
-	
-	
-	public final MgSpaceInitializer spaceInitializer;
 	
 	public final XeBoot boot;
 
@@ -87,7 +82,6 @@ public class XenonWebServer extends HTTP2_Server {
 	 */
 	public XenonWebServer(
 			XeCodebase codebase,
-			MgSpaceInitializer spaceInitializer,
 			XeBoot boot,
 			XML_Codebase lexicon,
 			XenonConfiguration configuration) throws Exception {
@@ -95,7 +89,6 @@ public class XenonWebServer extends HTTP2_Server {
 
 
 		this.codebase = codebase;
-		this.spaceInitializer = spaceInitializer;
 		this.boot = boot;
 
 
@@ -120,19 +113,32 @@ public class XenonWebServer extends HTTP2_Server {
 		if(magnesium.userDbConfigPathname == null) {
 			throw new IOException("A path must be defined for the user db");
 		}
-		userDb = new NoteMgDatabase(siliconEngine, codebase.user, Path.of(magnesium.userDbConfigPathname));
+		userDb = new NoteMgDatabase(siliconEngine, 
+				codebase.userCodebase, 
+				Path.of(magnesium.userDbConfigPathname));
+		
+		
 		
 		/* create space database */
 		if(magnesium.spaceDbConfigPathname == null) {
 			throw new IOException("A path must be defined for the space db");
 		}
-		spaceDb = new SpaceMgDatabase(siliconEngine, codebase.space, Path.of(magnesium.spaceDbConfigPathname), spaceInitializer);
+		spaceDb = new SpaceMgDatabase(siliconEngine, 
+				codebase.spaceCodebase, 
+				Path.of(magnesium.spaceDbConfigPathname), 
+				codebase.spaceInitializer);
+		
+		
 		
 		/* repository database */
 		if(magnesium.repoDbConfigPathname == null) {
 			throw new IOException("A path must be defined for the repo db");
 		}
-		repoDb = new RepoMgDatabase(siliconEngine, codebase.repo, Path.of(magnesium.repoDbConfigPathname));
+		repoDb = new RepoMgDatabase(siliconEngine, 
+				codebase.repoCodebase, 
+				Path.of(magnesium.repoDbConfigPathname));
+		
+		
 
 
 		if(isRedirecting = (configuration.http1_redirection!=null)) {
