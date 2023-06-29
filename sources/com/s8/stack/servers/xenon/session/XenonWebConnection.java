@@ -166,12 +166,14 @@ public class XenonWebConnection extends HTTP2_Connection {
 		server.userDb.get(0, username, output -> {
 			try {
 				
+				/* false by default */
 				boolean isSuccessfullyLoggedIn = false;
+				
 				if(output.isUserDefined) {
 
 					XeUser user = (XeUser) output.user;
 					
-					isSuccessfullyLoggedIn = user.password.equals(password);
+					isSuccessfullyLoggedIn = user.password.equals(password);	
 					
 					/* log-in effectively */
 					if (isSuccessfullyLoggedIn) {
