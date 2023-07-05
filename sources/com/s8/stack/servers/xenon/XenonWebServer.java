@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Path;
 
-import com.s8.arch.magnesium.databases.note.NoteMgDatabase;
-import com.s8.arch.magnesium.databases.repo.store.RepoMgDatabase;
+import com.s8.arch.magnesium.databases.record.RecordsMgDatabase;
+import com.s8.arch.magnesium.databases.repository.store.RepoMgDatabase;
 import com.s8.arch.magnesium.databases.space.store.SpaceMgDatabase;
 import com.s8.arch.magnesium.service.MgConfiguration;
 import com.s8.arch.silicon.SiliconEngine;
@@ -59,7 +59,7 @@ public class XenonWebServer extends HTTP2_Server {
 
 	
 	
-	public final NoteMgDatabase userDb;
+	public final RecordsMgDatabase userDb;
 	
 	public final SpaceMgDatabase spaceDb;
 	
@@ -113,7 +113,7 @@ public class XenonWebServer extends HTTP2_Server {
 		if(magnesium.userDbConfigPathname == null) {
 			throw new IOException("A path must be defined for the user db");
 		}
-		userDb = new NoteMgDatabase(siliconEngine, 
+		userDb = new RecordsMgDatabase(siliconEngine, 
 				codebase.userCodebase, 
 				Path.of(magnesium.userDbConfigPathname));
 		
