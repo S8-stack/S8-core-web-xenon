@@ -38,8 +38,7 @@ class PutUserOp extends XeAsyncFlowOperation {
 
 			@Override
 			public void run() {
-				String id = user.getUsername();
-				server.userDb.put(0L, id, (BeObject) user, 
+				server.userDb.put(0L, (BeObject) user, 
 						output -> {
 							onInserted.run(output);
 							flow.roll(true);

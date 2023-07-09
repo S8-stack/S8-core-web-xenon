@@ -30,6 +30,7 @@ public class XeUser extends BeObject implements S8User {
 	}
 	
 	
+	@Override
 	public String getUsername() {
 		return S8_key;
 	}

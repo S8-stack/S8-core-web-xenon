@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "/s8-web-front/*": [ "../../../com.s8.web.front/web-sources/s8-web-front/*" ],
+      "/s8-io-bohr-atom/*": [ "../../../com.s8.io.bohr.atom/web-sources/s8-io-bohr-atom/*" ],
+      "/s8-io-bohr-neon/*": [ "../../../com.s8.io.bohr.neon/web-sources/s8-io-bohr-neon/*" ],
+      "/s8-io-bytes/*": [ "../../../com.s8.io.bytes/web-sources/s8-io-bytes/*" ]
+    }
+  }
+}
