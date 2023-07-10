@@ -9,8 +9,22 @@ import com.s8.stack.servers.xenon.XenonWebServer;
 
 public class CreateRepoOp extends XeAsyncFlowOperation {
 
+	
+	/**
+	 * 
+	 */
+	public final String repositoryName;
+	
+	
+	/**
+	 * 
+	 */
 	public final String repositoryAddress;
 	
+	
+	/**
+	 * 
+	 */
 	public final String repositoryInfo;
 	
 	public final String mainBranchName;
@@ -34,6 +48,7 @@ public class CreateRepoOp extends XeAsyncFlowOperation {
 
 	public CreateRepoOp(XenonWebServer server, 
 			XeAsyncFlow flow, 
+			String repositoryName, 
 			String repositoryAddress, 
 			String repositoryInfo,
 			String mainBranchName,
@@ -42,6 +57,8 @@ public class CreateRepoOp extends XeAsyncFlowOperation {
 			S8OutputProcessor<RepoCreationS8AsyncOutput> onCommitted, 
 			long options) {
 		super(server, flow);
+		
+		this.repositoryName = repositoryName;
 		this.repositoryAddress = repositoryAddress;
 		this.repositoryInfo = repositoryInfo;
 			
@@ -65,6 +82,7 @@ public class CreateRepoOp extends XeAsyncFlowOperation {
 			@Override
 			public void run() {
 				server.repoDb.createRepository(0L, flow.user, 
+						repositoryName,
 						repositoryAddress, 
 						repositoryInfo,
 						mainBranchName,

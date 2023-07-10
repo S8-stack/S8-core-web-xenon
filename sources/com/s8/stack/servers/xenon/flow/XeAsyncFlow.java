@@ -15,6 +15,7 @@ import com.s8.arch.fluor.outputs.GetUserS8AsyncOutput;
 import com.s8.arch.fluor.outputs.ObjectsListS8AsyncOutput;
 import com.s8.arch.fluor.outputs.PutUserS8AsyncOutput;
 import com.s8.arch.fluor.outputs.RepoCreationS8AsyncOutput;
+import com.s8.arch.fluor.outputs.RepositoryMetadataS8AsyncOutput;
 import com.s8.arch.fluor.outputs.SpaceExposureS8AsyncOutput;
 import com.s8.arch.fluor.outputs.SpaceVersionS8AsyncOutput;
 import com.s8.arch.silicon.SiliconEngine;
@@ -265,6 +266,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow createRepository(
+			String repositoryName,
 			String repositoryAddress,
 			String repositoryInfo, 
 			String mainBranchName,
@@ -272,12 +274,27 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 			String initialCommitComment,
 			S8OutputProcessor<RepoCreationS8AsyncOutput> onCreated, long options) {
 		pushOperationLast(new CreateRepoOp(server, this, 
-				repositoryAddress, repositoryInfo, 
+				repositoryName, repositoryAddress, repositoryInfo, 
 				mainBranchName,
 				(NdObject[]) objects, initialCommitComment,
 				onCreated, options));
 		return this;
 	}
+	
+	
+
+
+
+
+	@Override
+	public S8AsyncFlow getRepositoryMetadata(String repositoryAddress,
+			S8OutputProcessor<RepositoryMetadataS8AsyncOutput> onForked, long options) {
+		pushOperationLast(new GetRepoMetadataOp(server, null, repositoryAddress, onForked, options));
+		return this;
+	}
+
+
+
 
 
 	@Override
@@ -345,6 +362,9 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public void terminate() {
 		isTerminated = true;
 	}
+
+
+
 
 
 
