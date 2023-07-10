@@ -62,7 +62,7 @@ public class CommitBranchOp extends XeAsyncFlowOperation {
 			
 			@Override
 			public void run() {
-				server.repoDb.commitBranch(0L, repositoryAddress, branchId, objects, author, comment,
+				server.repoDb.commitBranch(0L, flow.user, repositoryAddress, branchId, objects, comment,
 						output -> { 
 							onCommitted.run(output); 
 							flow.roll(true);

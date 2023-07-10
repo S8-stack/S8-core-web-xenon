@@ -71,7 +71,7 @@ public class CloneBranchOp extends XeAsyncFlowOperation {
 			
 			@Override
 			public void run() {
-				server.repoDb.cloneBranch(0L, repositoryAddress, branchId, version,  
+				server.repoDb.cloneBranch(0L, flow.user, repositoryAddress, branchId, version,  
 						output -> { 
 							onCloned.run(output); 
 							flow.roll(true);

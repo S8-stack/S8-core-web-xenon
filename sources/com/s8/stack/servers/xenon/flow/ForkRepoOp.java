@@ -12,32 +12,27 @@ import com.s8.stack.servers.xenon.XenonWebServer;
  * @author pierreconvert
  *
  */
-public class ForkBranchOp extends XeAsyncFlowOperation {
+public class ForkRepoOp extends XeAsyncFlowOperation {
 
 	
 	/**
 	 * 
 	 */
-	public final String repositoryAddress;
-
-
-	/**
-	 * 
-	 */
+	public final String originRepositoryAddress;
+	
+	
 	public final String originBranchId;
-
 	
-	/**
-	 * 
-	 */
+	
 	public final long originBranchVersion;
-	
-	
+
+
 	/**
 	 * 
 	 */
-	public final String targetBranchId;
+	public final String targetRepositoryAddress;
 
+	
 
 
 	/**
@@ -52,19 +47,19 @@ public class ForkBranchOp extends XeAsyncFlowOperation {
 
 
 
-	public ForkBranchOp(XenonWebServer server, 
+	public ForkRepoOp(XenonWebServer server, 
 			XeAsyncFlow flow, 
-			String repositoryAddress, 
+			String originRepositoryAddress, 
 			String originBranchId,
 			long originBranchVersion,
-			String targetBranchId,
+			String targetRepositoryAddress,
 			S8OutputProcessor<BranchCreationS8AsyncOutput> onCommitted, 
 			long options) {
 		super(server, flow);
-		this.repositoryAddress = repositoryAddress;
+		this.originRepositoryAddress = originRepositoryAddress;
 		this.originBranchId = originBranchId;
 		this.originBranchVersion = originBranchVersion;
-		this.targetBranchId = targetBranchId;
+		this.targetRepositoryAddress = targetRepositoryAddress;
 		this.onCommitted = onCommitted;
 		this.options = options;
 	}
@@ -79,9 +74,9 @@ public class ForkBranchOp extends XeAsyncFlowOperation {
 			
 			@Override
 			public void run() {
-				server.repoDb.forkBranch(0L, flow.user, repositoryAddress, 
-						originBranchId, originBranchVersion, 
-						targetBranchId, 
+				server.repoDb.forkBranch(0L, flow.user, 
+						originRepositoryAddress, originBranchId, originBranchVersion, 
+						targetRepositoryAddress,
 						output -> { 
 							onCommitted.run(output); 
 							flow.roll(true);

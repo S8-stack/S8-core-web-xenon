@@ -64,10 +64,11 @@ public class CreateRepoOp extends XeAsyncFlowOperation {
 			
 			@Override
 			public void run() {
-				server.repoDb.createRepository(0L, repositoryAddress, 
+				server.repoDb.createRepository(0L, flow.user, 
+						repositoryAddress, 
 						repositoryInfo,
 						mainBranchName,
-						objects, initialCommitComment, flow.user,
+						objects, initialCommitComment, 
 						output -> { 
 							onCommitted.run(output); 
 							flow.roll(true);

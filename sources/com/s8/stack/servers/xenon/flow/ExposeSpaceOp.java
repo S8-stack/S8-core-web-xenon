@@ -42,7 +42,7 @@ public class ExposeSpaceOp extends XeAsyncFlowOperation {
 			
 			@Override
 			public void run() {
-				server.spaceDb.exposeObjects(0, spaceId, exposure, 
+				server.spaceDb.exposeObjects(0, flow.user, spaceId, exposure, 
 						output -> {
 							onRebased.run(output);
 							flow.roll(true);

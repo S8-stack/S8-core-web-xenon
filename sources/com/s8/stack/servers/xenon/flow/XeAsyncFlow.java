@@ -292,8 +292,28 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 
+
+
+
 	@Override
-	public S8AsyncFlow commit(String repositoryAddress, String branchId, 
+	public S8AsyncFlow forkRepository(String originRepositoryAddress, 
+			String originBranchId, long originBranchVersion,
+			String targetRepositoryAddress,
+			S8OutputProcessor<BranchCreationS8AsyncOutput> onForked, long options) {
+		pushOperationLast(new ForkRepoOp(server, this, 
+				originRepositoryAddress, 
+				originBranchId, originBranchVersion, 
+				targetRepositoryAddress,
+				onForked, options));
+		return this;
+	}
+
+
+
+
+
+	@Override
+	public S8AsyncFlow commitBranch(String repositoryAddress, String branchId, 
 			Object[] objects, String author, String comment,
 			S8OutputProcessor<BranchVersionS8AsyncOutput> onCommitted, long options) {
 		pushOperationLast(new CommitBranchOp(server, this, repositoryAddress, branchId, 
@@ -325,6 +345,8 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public void terminate() {
 		isTerminated = true;
 	}
+
+
 
 
 
