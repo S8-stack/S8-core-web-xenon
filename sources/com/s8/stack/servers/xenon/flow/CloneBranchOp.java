@@ -1,12 +1,19 @@
 package com.s8.stack.servers.xenon.flow;
 
 import com.s8.arch.fluor.S8OutputProcessor;
-import com.s8.arch.fluor.outputs.BranchCreationS8AsyncOutput;
+import com.s8.arch.fluor.outputs.BranchExposureS8AsyncOutput;
 import com.s8.arch.silicon.async.AsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
-public class CreateBranchOp extends XeAsyncFlowOperation {
+
+/**
+ * 
+ * @author pierreconvert
+ *
+ */
+public class CloneBranchOp extends XeAsyncFlowOperation {
+
 
 	public final String repositoryAddress;
 
@@ -14,46 +21,62 @@ public class CreateBranchOp extends XeAsyncFlowOperation {
 	public final String branchId;
 
 
-	/**
-	 * 
-	 */
-	public final S8OutputProcessor<BranchCreationS8AsyncOutput> onCommitted;
+	public final long version;
 
-	/**
-	 * 
-	 */
+
+	public final S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned;
+
+	
 	public final long options;
+	
+	
+	
 
-
-
-	public CreateBranchOp(XenonWebServer server, 
+	/**
+	 * 
+	 * @param server
+	 * @param flow
+	 * @param repositoryAddress
+	 * @param branchId
+	 * @param version
+	 * @param onCloned
+	 * @param onException
+	 */
+	public CloneBranchOp(XenonWebServer server, 
 			XeAsyncFlow flow, 
 			String repositoryAddress, 
 			String branchId,
-			S8OutputProcessor<BranchCreationS8AsyncOutput> onCommitted, 
+			long version, 
+			S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned, 
 			long options) {
+		
 		super(server, flow);
 		this.repositoryAddress = repositoryAddress;
 		this.branchId = branchId;
-		this.onCommitted = onCommitted;
+		this.version = version;
+		this.onCloned = onCloned;
 		this.options = options;
 	}
 
 
 
 
+
+
 	@Override
 	public AsyncTask createTask() { 
+		
+		
 		return new AsyncTask() {
-			
 			
 			@Override
 			public void run() {
-				server.repoDb.createBranch(0L, repositoryAddress, branchId, 
+				server.repoDb.cloneBranch(0L, repositoryAddress, branchId, version,  
 						output -> { 
-							onCommitted.run(output); 
+							onCloned.run(output); 
 							flow.roll(true);
-						}, options);
+						},
+						options);
 			}
 			
 			@Override
@@ -63,4 +86,5 @@ public class CreateBranchOp extends XeAsyncFlowOperation {
 			public String describe() { return "Committing"; }
 		};
 	}
+
 }
