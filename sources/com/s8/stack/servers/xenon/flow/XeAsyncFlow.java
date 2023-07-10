@@ -289,7 +289,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	@Override
 	public S8AsyncFlow getRepositoryMetadata(String repositoryAddress,
 			S8OutputProcessor<RepositoryMetadataS8AsyncOutput> onForked, long options) {
-		pushOperationLast(new GetRepoMetadataOp(server, null, repositoryAddress, onForked, options));
+		pushOperationLast(new GetRepoMetadataOp(server, this, repositoryAddress, onForked, options));
 		return this;
 	}
 

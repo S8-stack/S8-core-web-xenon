@@ -36,7 +36,7 @@ public class AccessSpaceOp extends XeAsyncFlowOperation {
 			
 			@Override
 			public void run() {
-				server.spaceDb.accessExposure(0L, flow.user, spaceId, 
+				server.spaceDb.accessSpace(0L, flow.user, spaceId, 
 						exposure -> {
 							onAccessed.run(exposure);
 							flow.roll(true);

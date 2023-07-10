@@ -125,8 +125,7 @@ public class XenonWebServer extends HTTP2_Server {
 		}
 		spaceDb = new SpaceMgDatabase(siliconEngine, 
 				codebase.spaceCodebase, 
-				Path.of(magnesium.spaceDbConfigPathname), 
-				codebase.spaceInitializer);
+				Path.of(magnesium.spaceDbConfigPathname));
 		
 		
 		

@@ -1,6 +1,5 @@
 package com.s8.stack.servers.xenon;
 
-import com.s8.arch.magnesium.databases.space.store.MgSpaceInitializer;
 import com.s8.io.bohr.beryllium.codebase.BeCodebase;
 import com.s8.io.bohr.beryllium.exception.BeBuildException;
 import com.s8.io.bohr.lithium.codebase.LiCodebase;
@@ -28,8 +27,6 @@ public class XeCodebase {
 	 */
 	public final LiCodebase spaceCodebase;
 	
-	
-	public final MgSpaceInitializer spaceInitializer;
 
 	
 	/**
@@ -48,7 +45,7 @@ public class XeCodebase {
 	 * @throws NdBuildException
 	 */
 	public XeCodebase(Class<?> userType, 
-			Class<?>[] spaceTypes, MgSpaceInitializer spaceInitializer,
+			Class<?>[] spaceTypes,
 			Class<?>[] repoTypes) 
 			throws 
 			BeBuildException, 
@@ -57,7 +54,6 @@ public class XeCodebase {
 		super();
 		this.userCodebase = BeCodebase.from(userType);
 		this.spaceCodebase = LiCodebase.from(spaceTypes);
-		this.spaceInitializer = spaceInitializer;
 		this.repoCodebase = NdCodebase.from(repoTypes);
 	}
 
