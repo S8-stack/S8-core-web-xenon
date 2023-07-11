@@ -51,11 +51,13 @@ public class XenonWebConnection extends HTTP2_Connection {
 
 	final SiliconEngine ng;
 
+
+	private XeSessionStatus status = XeSessionStatus.UNINITIALIZED;
+
 	private NeBranch neBranch;
 
 	public final Object lock = new Object();
 
-	public volatile boolean isLoggedIn = false;
 
 	public XeUser user;
 
@@ -78,7 +80,7 @@ public class XenonWebConnection extends HTTP2_Connection {
 		 * debugBoot = new DebugBootModule(this);
 		 */
 
-		isLoggedIn = false;
+		status = XeSessionStatus.UNINITIALIZED;
 	}
 
 	@Override
@@ -107,10 +109,19 @@ public class XenonWebConnection extends HTTP2_Connection {
 		}
 	}
 
+	/**
+	 * 
+	 * @param request
+	 */
 	private void serve_GET(HTTP2_Message request) {
 		server.carbonWebService.serve(request);
 	}
 
+
+	/**
+	 * 
+	 * @param request
+	 */
 	private void serve_POST(HTTP2_Message request) {
 		try {
 
@@ -132,13 +143,13 @@ public class XenonWebConnection extends HTTP2_Connection {
 				serveLogIn(inflow, response);
 				break;
 
-			/* typically step 1 : sucessful log-in call boot */
+				/* typically step 1 : sucessful log-in call boot */
 			case XeRequestKeywords.BOOT:
 				// debugBoot.serve(neRequest, response); break;
 				serveBoot(inflow, response);
 				break;
 
-			/* typically further steps */
+				/* typically further steps */
 			case XeRequestKeywords.RUN_FUNC:
 				serveFunc(inflow, response);
 				break;
@@ -153,6 +164,7 @@ public class XenonWebConnection extends HTTP2_Connection {
 		}
 	}
 
+
 	/**
 	 * 
 	 * @param inflow
@@ -160,30 +172,33 @@ public class XenonWebConnection extends HTTP2_Connection {
 	 * @throws IOException
 	 */
 	private void serveLogIn(ByteInflow inflow, HTTP2_Message response) throws IOException {
+
+		/* can always go back to log-in -> no filter */
 		String username = inflow.getStringUTF8();
 		String password = inflow.getStringUTF8();
 
 		server.userDb.get(0, username, output -> {
 			try {
-				
+
 				/* false by default */
 				boolean isSuccessfullyLoggedIn = false;
-				
+
 				if(output.isUserDefined) {
 
 					XeUser user = (XeUser) output.user;
-					
+
 					isSuccessfullyLoggedIn = user.password.equals(password);	
-					
+
 					/* log-in effectively */
 					if (isSuccessfullyLoggedIn) {
-						logIn(user);
+						this.user = user;
+						this.status = XeSessionStatus.LOGGED_IN;
 					}
 				}
-				
+
 				LinkedByteOutflow outflow = new LinkedByteOutflow(64);
-				outflow.putUInt8(isSuccessfullyLoggedIn ? XeResponseKeywords.SUCCESSFULLY_LOGGED_IN
-						: XeResponseKeywords.LOG_IN_FAILED);
+				outflow.putUInt8(isSuccessfullyLoggedIn ? 
+						XeResponseKeywords.SUCCESSFULLY_LOGGED_IN : XeResponseKeywords.LOG_IN_FAILED);
 				LinkedBytes head = outflow.getHead();
 				ng.pushAsyncTask(new RespondOk(response, head));
 
@@ -193,74 +208,108 @@ public class XenonWebConnection extends HTTP2_Connection {
 
 			}
 		}, 0x0L);
+
 	}
 
-	private void logIn(XeUser user) {
-		synchronized (lock) {
-			this.isLoggedIn = isLoggedIn;
-			this.user = user;
-		}
-	}
 
+
+
+	/**
+	 * 
+	 * @param inflow
+	 * @param response
+	 */
 	private void serveBoot(ByteInflow inflow, HTTP2_Message response) {
-		ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
+		if(status == XeSessionStatus.LOGGED_IN) {
+			ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
 
-			public @Override String describe() {
-				return "Normal server processing";
-			}
-
-			public @Override MthProfile profile() {
-				return MthProfile.FX2;
-			}
-
-			@Override
-			public void run() {
-
-				// build new branch
-				neBranch = new NeBranch("w");
-
-				XeAsyncFlow flow = new XeAsyncFlow(server, ng, user, neBranch, response);
-
-				try {
-					// boot...
-					server.boot.boot(neBranch, flow);
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-					ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error"));
+				public @Override String describe() {
+					return "Normal server processing";
 				}
-			}
-		});
-	}
 
-	private void serveFunc(ByteInflow inflow, HTTP2_Message response) {
-		ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
+				public @Override MthProfile profile() {
+					return MthProfile.FX2;
+				}
 
-			public @Override String describe() {
-				return "Normal server processing";
-			}
+				@Override
+				public void run() {
 
-			public @Override MthProfile profile() {
-				return MthProfile.FX2;
-			}
-
-			@Override
-			public void run() {
-				try {
+					// build new branch
+					neBranch = new NeBranch("w");
+					status = XeSessionStatus.BOOTED_UP;
 
 					XeAsyncFlow flow = new XeAsyncFlow(server, ng, user, neBranch, response);
 
-					/* branch inbound -> fire the appropriate function */
-					neBranch.inbound.consume(flow, inflow);
+					try {
+						// boot...
+						server.boot.boot(neBranch, flow);
 
-				} catch (IOException e) {
-					ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error: " + e.getMessage()));
+					} catch (Exception e) {
+						e.printStackTrace();
+						ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error"));
+					}
 				}
-			}
-
-		});
+			});
+		}
+		else {
+			ng.pushAsyncTask(new SendError(response, HTTP2_Status.Network_Authentication_Required, "Must be logged-in"));
+		}
 	}
 
+
+
+	/**
+	 * 
+	 * @param inflow
+	 * @param response
+	 */
+	private void serveFunc(ByteInflow inflow, HTTP2_Message response) {
+		if(status == XeSessionStatus.BOOTED_UP) {
+			ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
+
+				public @Override String describe() {
+					return "Normal server processing";
+				}
+
+				public @Override MthProfile profile() {
+					return MthProfile.FX2;
+				}
+
+				@Override
+				public void run() {
+					if(neBranch != null) { /* on-going session _*/
+						try {
+
+							XeAsyncFlow flow = new XeAsyncFlow(server, ng, user, neBranch, response);
+
+							/* branch inbound -> fire the appropriate function */
+							neBranch.inbound.consume(flow, inflow);
+
+						} catch (IOException e) {
+							ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error: " + e.getMessage()));
+						}	
+					}
+					else {
+						ng.pushAsyncTask(new SendError(response, HTTP2_Status.Bad_Gateway, "Error"));
+					}
+
+				}
+
+			});
+		}
+		else {
+			ng.pushAsyncTask(new SendError(response, HTTP2_Status.SWITCHING_PROTOCOL, "Must be booted-up"));
+		}
+	}
+
+
+
+	/**
+	 * 
+	 * @param request
+	 * @param status
+	 * @param message
+	 */
 	private void serveError(HTTP2_Message request, HTTP2_Status status, String message) {
 		ng.pushAsyncTask(new SendError(request.respond(), status, message));
 	}
