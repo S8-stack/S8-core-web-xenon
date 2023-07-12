@@ -1,8 +1,5 @@
 package com.s8.stack.servers.xenon.flow;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
 import com.s8.arch.fluor.S8AsyncFlow;
 import com.s8.arch.fluor.S8CodeBlock;
 import com.s8.arch.fluor.S8Filter;
@@ -54,10 +51,8 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	/**
 	 * 
 	 */
-	private Deque<XeAsyncFlowOperation> operations = new ArrayDeque<>();
+	private XeFlowChain<XeAsyncFlowOperation> operations = new XeFlowChain<>();
 	
-	private Deque<XeAsyncFlowOperation> sequenceBuilder = new ArrayDeque<>();
-
 
 	public XeAsyncFlow(XenonWebServer server,
 			SiliconEngine ng, 
@@ -86,29 +81,13 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	 * @param engine
 	 * @param operation
 	 */
-	protected void pushOperationLast(XeAsyncFlowOperation operation) {
+	protected void pushOperation(XeAsyncFlowOperation operation) {
 
 		/* low contention synchronized section */
 		synchronized (lock) {
 
 			/* enqueue operation */
-			sequenceBuilder.addLast(operation);
-		}
-	}
-
-
-	/**
-	 * 
-	 * @param engine
-	 * @param operation
-	 */
-	protected void pushOperationFirst(XeAsyncFlowOperation operation) {
-
-		/* low contention synchronized section */
-		synchronized (lock) {
-
-			/* enqueue operation */
-			sequenceBuilder.addLast(operation);
+			operations.insertAfterActive(operation);
 		}
 	}
 
@@ -117,15 +96,6 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public void play() {
-		
-		synchronized (lock) {
-			
-			/* Empty sequence builder and append operations to the main deque */
-			while(!sequenceBuilder.isEmpty()) {
-				operations.addFirst(sequenceBuilder.pollLast());
-			}
-			
-		}
 		
 		/* launch rolling */
 		roll(false);
@@ -162,13 +132,23 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 				
 				if(!operations.isEmpty()) {
 					isActive = true;
-					XeAsyncFlowOperation operation = operations.poll();					
+					
+					/*
+					 * Retrieve but not removed the head
+					 */
+					XeAsyncFlowOperation operation = operations.getHead();					
 
 					ng.pushAsyncTask(operation.createTask());
 					/*
 					 * Immediately exit Syncchronized block after pushing the task
 					 * --> Leave time to avoid contention
 					 */
+					
+					/**
+					 * remove head
+					 */
+					operations.popHead();
+					
 				}
 				else { // no more operation
 					isActive = false;
@@ -185,7 +165,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow runBlock(int profile, S8CodeBlock runnable) {
-		pushOperationLast(new RunBlockOp(server, this, runnable));
+		pushOperation(new RunBlockOp(server, this, runnable));
 		return this;
 	}
 
@@ -209,13 +189,13 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow getUser(String username, S8OutputProcessor<GetUserS8AsyncOutput> onRetrieved, long options) {
-		pushOperationLast(new GetUserOp(server, this, username, onRetrieved, options));
+		pushOperation(new GetUserOp(server, this, username, onRetrieved, options));
 		return this;
 	}
 	
 	@Override
 	public S8AsyncFlow putUser(S8User user, S8OutputProcessor<PutUserS8AsyncOutput> onInserted, long options) {
-		pushOperationLast(new PutUserOp(server, this, user, onInserted, options));
+		pushOperation(new PutUserOp(server, this, user, onInserted, options));
 		return this;
 	}
 
@@ -224,7 +204,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public S8AsyncFlow selectUsers(S8Filter<S8User> filter, 
 			S8OutputProcessor<ObjectsListS8AsyncOutput<S8User>> onSelected, 
 			long options) {
-		pushOperationLast(new SelectUsersOp(server, this, filter, onSelected, options));
+		pushOperation(new SelectUsersOp(server, this, filter, onSelected, options));
 		return this;
 	}
 
@@ -235,7 +215,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow accessSpace(String spaceId, S8OutputProcessor<SpaceExposureS8AsyncOutput> onAccessed, long options) {
-		pushOperationLast(new AccessSpaceOp(server, this, spaceId, onAccessed, options));
+		pushOperation(new AccessSpaceOp(server, this, spaceId, onAccessed, options));
 		return this;
 	}
 
@@ -243,7 +223,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow accessMySpace(S8OutputProcessor<SpaceExposureS8AsyncOutput> onAccessed, long options) {
-		pushOperationLast(new AccessSpaceOp(server, this, getMySpaceId(), onAccessed, options));
+		pushOperation(new AccessSpaceOp(server, this, getMySpaceId(), onAccessed, options));
 		return this;
 	}
 
@@ -251,14 +231,14 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	@Override
 	public S8AsyncFlow exposeSpace(String spaceId, Object[] exposure, S8OutputProcessor<SpaceVersionS8AsyncOutput> onRebased,
 			long options) {
-		pushOperationLast(new ExposeSpaceOp(server, this, spaceId, exposure, onRebased, options));
+		pushOperation(new ExposeSpaceOp(server, this, spaceId, exposure, onRebased, options));
 		return this;
 	}
 	
 
 	@Override
 	public S8AsyncFlow exposeMySpace(Object[] exposure, S8OutputProcessor<SpaceVersionS8AsyncOutput> onRebased, long options) {
-		pushOperationLast(new ExposeSpaceOp(server, this, getMySpaceId(), exposure, onRebased, options));
+		pushOperation(new ExposeSpaceOp(server, this, getMySpaceId(), exposure, onRebased, options));
 		return this;
 	}
 
@@ -273,7 +253,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 			Object[] objects,
 			String initialCommitComment,
 			S8OutputProcessor<RepoCreationS8AsyncOutput> onCreated, long options) {
-		pushOperationLast(new CreateRepoOp(server, this, 
+		pushOperation(new CreateRepoOp(server, this, 
 				repositoryName, repositoryAddress, repositoryInfo, 
 				mainBranchName,
 				(NdObject[]) objects, initialCommitComment,
@@ -289,7 +269,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	@Override
 	public S8AsyncFlow getRepositoryMetadata(String repositoryAddress,
 			S8OutputProcessor<RepositoryMetadataS8AsyncOutput> onForked, long options) {
-		pushOperationLast(new GetRepoMetadataOp(server, this, repositoryAddress, onForked, options));
+		pushOperation(new GetRepoMetadataOp(server, this, repositoryAddress, onForked, options));
 		return this;
 	}
 
@@ -301,7 +281,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public S8AsyncFlow forkBranch(String repositoryAddress, 
 			String originBranchId, long originBranchVersion, String targetBranchId,
 			S8OutputProcessor<BranchCreationS8AsyncOutput> onCreated, long options) {
-		pushOperationLast(new ForkBranchOp(server, this, repositoryAddress, 
+		pushOperation(new ForkBranchOp(server, this, repositoryAddress, 
 				originBranchId, originBranchVersion, targetBranchId,
 				onCreated, options));
 		return this;
@@ -317,7 +297,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 			String originBranchId, long originBranchVersion,
 			String targetRepositoryAddress,
 			S8OutputProcessor<BranchCreationS8AsyncOutput> onForked, long options) {
-		pushOperationLast(new ForkRepoOp(server, this, 
+		pushOperation(new ForkRepoOp(server, this, 
 				originRepositoryAddress, 
 				originBranchId, originBranchVersion, 
 				targetRepositoryAddress,
@@ -333,7 +313,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public S8AsyncFlow commitBranch(String repositoryAddress, String branchId, 
 			Object[] objects, String author, String comment,
 			S8OutputProcessor<BranchVersionS8AsyncOutput> onCommitted, long options) {
-		pushOperationLast(new CommitBranchOp(server, this, repositoryAddress, branchId, 
+		pushOperation(new CommitBranchOp(server, this, repositoryAddress, branchId, 
 				objects, author, comment,
 				onCommitted, options));
 		return this;
@@ -345,7 +325,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public S8AsyncFlow cloneBranch(String repositoryAddress, String branchId, long version,
 			S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned, 
 			long options) {
-		pushOperationLast(new CloneBranchOp(server, this, repositoryAddress, branchId, version, onCloned, options));
+		pushOperation(new CloneBranchOp(server, this, repositoryAddress, branchId, version, onCloned, options));
 		return this;
 	}
 
@@ -354,7 +334,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public void send() {
-		pushOperationLast(new SendOp(server, this, branch, response));
+		pushOperation(new SendOp(server, this, branch, response));
 		play();
 	}
 
