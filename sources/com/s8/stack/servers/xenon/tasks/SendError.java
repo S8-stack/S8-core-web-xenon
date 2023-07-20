@@ -1,6 +1,6 @@
 package com.s8.stack.servers.xenon.tasks;
 
-import com.s8.arch.silicon.async.AsyncTask;
+import com.s8.arch.silicon.async.SiAsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.io.bytes.linked.LinkedBytes;
 import com.s8.stack.arch.helium.http2.HTTP2_Status;
@@ -10,7 +10,7 @@ import com.s8.stack.arch.helium.http2.headers.Status;
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
 import com.s8.stack.arch.helium.mime.MIME_Type;
 
-public class SendError implements AsyncTask {
+public class SendError implements SiAsyncTask {
 
 	public final HTTP2_Message response;
 	

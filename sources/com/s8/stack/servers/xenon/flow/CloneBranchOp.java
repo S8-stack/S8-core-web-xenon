@@ -2,7 +2,7 @@ package com.s8.stack.servers.xenon.flow;
 
 import com.s8.arch.fluor.S8OutputProcessor;
 import com.s8.arch.fluor.outputs.BranchExposureS8AsyncOutput;
-import com.s8.arch.silicon.async.AsyncTask;
+import com.s8.arch.silicon.async.SiAsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
@@ -64,10 +64,10 @@ public class CloneBranchOp extends XeAsyncFlowOperation {
 
 
 	@Override
-	public AsyncTask createTask() { 
+	public SiAsyncTask createTask() { 
 		
 		
-		return new AsyncTask() {
+		return new SiAsyncTask() {
 			
 			@Override
 			public void run() {

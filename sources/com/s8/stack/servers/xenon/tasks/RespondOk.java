@@ -1,6 +1,6 @@
 package com.s8.stack.servers.xenon.tasks;
 
-import com.s8.arch.silicon.async.AsyncTask;
+import com.s8.arch.silicon.async.SiAsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.io.bytes.linked.LinkedBytes;
 import com.s8.stack.arch.helium.http2.HTTP2_Status;
@@ -16,7 +16,7 @@ import com.s8.stack.arch.helium.mime.MIME_Type;
  * @author pierreconvert
  *
  */
-public class RespondOk implements AsyncTask {
+public class RespondOk implements SiAsyncTask {
 
 	public final HTTP2_Message response;
 	

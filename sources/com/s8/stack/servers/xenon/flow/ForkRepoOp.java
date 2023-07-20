@@ -2,7 +2,7 @@ package com.s8.stack.servers.xenon.flow;
 
 import com.s8.arch.fluor.S8OutputProcessor;
 import com.s8.arch.fluor.outputs.BranchCreationS8AsyncOutput;
-import com.s8.arch.silicon.async.AsyncTask;
+import com.s8.arch.silicon.async.SiAsyncTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
@@ -68,8 +68,8 @@ public class ForkRepoOp extends XeAsyncFlowOperation {
 
 
 	@Override
-	public AsyncTask createTask() { 
-		return new AsyncTask() {
+	public SiAsyncTask createTask() { 
+		return new SiAsyncTask() {
 			
 			
 			@Override

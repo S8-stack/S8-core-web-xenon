@@ -5,6 +5,7 @@ import com.s8.arch.fluor.S8CodeBlock;
 import com.s8.arch.fluor.S8Filter;
 import com.s8.arch.fluor.S8OutputProcessor;
 import com.s8.arch.fluor.S8User;
+import com.s8.arch.fluor.delivery.S8WebResourceGenerator;
 import com.s8.arch.fluor.outputs.BranchCreationS8AsyncOutput;
 import com.s8.arch.fluor.outputs.BranchExposureS8AsyncOutput;
 import com.s8.arch.fluor.outputs.BranchVersionS8AsyncOutput;
@@ -21,6 +22,7 @@ import com.s8.io.bohr.neon.core.NeBranch;
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
 import com.s8.stack.servers.xenon.XeUser;
 import com.s8.stack.servers.xenon.XenonWebServer;
+import com.s8.stack.servers.xenon.flow.delivery.XeDeliveryTask;
 
 public class XeAsyncFlow implements S8AsyncFlow  {
 
@@ -348,7 +350,10 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 
-
+	@Override
+	public void deliver(int load, S8WebResourceGenerator generator) {
+		ng.pushAsyncTask(new XeDeliveryTask(ng, response, generator));
+	}
 
 
 }
