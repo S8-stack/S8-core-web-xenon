@@ -135,6 +135,15 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 				if(!operations.isEmpty()) {
 					isActive = true;
 					
+					if(isContinued) {
+						/**
+						 * The operation that calls back this flow is still the head of operations
+						 * (We let them the head for proper insertion when running the task)
+						 * Now, last time to remove the head and access next operation
+						 */
+						operations.popHead();
+					}
+					
 					/*
 					 * Retrieve but not removed the head
 					 */
@@ -146,10 +155,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 					 * --> Leave time to avoid contention
 					 */
 					
-					/**
-					 * remove head
-					 */
-					operations.popHead();
+				
 					
 				}
 				else { // no more operation
