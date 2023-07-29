@@ -4,7 +4,7 @@ import com.s8.arch.fluor.S8Filter;
 import com.s8.arch.fluor.S8OutputProcessor;
 import com.s8.arch.fluor.S8User;
 import com.s8.arch.fluor.outputs.ObjectsListS8AsyncOutput;
-import com.s8.arch.silicon.async.SiAsyncTask;
+import com.s8.arch.silicon.async.AsyncSiTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
@@ -53,9 +53,9 @@ public class SelectUsersOp extends XeAsyncFlowOperation {
 
 
 	@Override
-	public SiAsyncTask createTask() { 
+	public AsyncSiTask createTask() { 
 
-		return new SiAsyncTask() {
+		return new AsyncSiTask() {
 
 			@Override
 			public void run() {

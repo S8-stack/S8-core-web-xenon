@@ -1,6 +1,6 @@
 package com.s8.stack.servers.xenon.flow;
 
-import com.s8.arch.silicon.async.SiAsyncTask;
+import com.s8.arch.silicon.async.AsyncSiTask;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
 public abstract class XeAsyncFlowOperation {
@@ -12,7 +12,7 @@ public abstract class XeAsyncFlowOperation {
 	
 
 
-	public abstract SiAsyncTask createTask();
+	public abstract AsyncSiTask createTask();
 
 
 	public XeAsyncFlowOperation(XenonWebServer server, XeAsyncFlow flow) {

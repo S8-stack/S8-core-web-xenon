@@ -3,7 +3,7 @@ package com.s8.stack.servers.xenon.flow;
 import com.s8.arch.fluor.S8OutputProcessor;
 import com.s8.arch.fluor.S8User;
 import com.s8.arch.fluor.outputs.PutUserS8AsyncOutput;
-import com.s8.arch.silicon.async.SiAsyncTask;
+import com.s8.arch.silicon.async.AsyncSiTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.io.bohr.beryllium.object.BeObject;
 import com.s8.stack.servers.xenon.XenonWebServer;
@@ -32,8 +32,8 @@ class PutUserOp extends XeAsyncFlowOperation {
 
 
 	@Override
-	public SiAsyncTask createTask() { 
-		return new SiAsyncTask() {
+	public AsyncSiTask createTask() { 
+		return new AsyncSiTask() {
 
 
 			@Override

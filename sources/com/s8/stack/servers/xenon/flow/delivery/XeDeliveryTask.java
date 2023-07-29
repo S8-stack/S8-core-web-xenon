@@ -4,7 +4,7 @@ import com.s8.arch.fluor.delivery.S8WebResource;
 import com.s8.arch.fluor.delivery.S8WebResourceGenerator;
 import com.s8.arch.silicon.SiliconEngine;
 import com.s8.arch.silicon.async.MthProfile;
-import com.s8.arch.silicon.async.SiAsyncTask;
+import com.s8.arch.silicon.async.AsyncSiTask;
 import com.s8.io.bytes.linked.LinkedBytes;
 import com.s8.stack.arch.helium.http2.HTTP2_Status;
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
@@ -16,7 +16,7 @@ import com.s8.stack.servers.xenon.tasks.SendError;
  * @author pierreconvert
  *
  */
-public class XeDeliveryTask implements SiAsyncTask {
+public class XeDeliveryTask implements AsyncSiTask {
 	
 	public final SiliconEngine ng;
 	

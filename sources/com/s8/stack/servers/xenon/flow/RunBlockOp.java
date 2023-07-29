@@ -1,7 +1,7 @@
 package com.s8.stack.servers.xenon.flow;
 
 import com.s8.arch.fluor.S8CodeBlock;
-import com.s8.arch.silicon.async.SiAsyncTask;
+import com.s8.arch.silicon.async.AsyncSiTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
@@ -19,9 +19,9 @@ public class RunBlockOp extends XeAsyncFlowOperation {
 
 
 	@Override
-	public SiAsyncTask createTask() { 
+	public AsyncSiTask createTask() { 
 
-		return new SiAsyncTask() {
+		return new AsyncSiTask() {
 
 			@Override
 			public void run() {

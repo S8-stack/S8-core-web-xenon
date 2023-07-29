@@ -2,7 +2,7 @@ package com.s8.stack.servers.xenon.flow;
 
 import com.s8.arch.fluor.S8OutputProcessor;
 import com.s8.arch.fluor.outputs.SpaceVersionS8AsyncOutput;
-import com.s8.arch.silicon.async.SiAsyncTask;
+import com.s8.arch.silicon.async.AsyncSiTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
@@ -36,9 +36,9 @@ public class ExposeSpaceOp extends XeAsyncFlowOperation {
 
 
 	@Override
-	public SiAsyncTask createTask() { 
+	public AsyncSiTask createTask() { 
 		
-		return new SiAsyncTask() {
+		return new AsyncSiTask() {
 			
 			@Override
 			public void run() {

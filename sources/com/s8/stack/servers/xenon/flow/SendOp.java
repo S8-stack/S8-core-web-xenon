@@ -2,7 +2,7 @@ package com.s8.stack.servers.xenon.flow;
 
 import java.io.IOException;
 
-import com.s8.arch.silicon.async.SiAsyncTask;
+import com.s8.arch.silicon.async.AsyncSiTask;
 import com.s8.arch.silicon.async.MthProfile;
 import com.s8.io.bohr.neon.core.NeBranch;
 import com.s8.io.bytes.linked.LinkedByteOutflow;
@@ -44,7 +44,7 @@ public class SendOp extends XeAsyncFlowOperation {
 
 
 
-	private class Task implements SiAsyncTask {
+	private class Task implements AsyncSiTask {
 
 
 		public Task() {
@@ -119,7 +119,7 @@ public class SendOp extends XeAsyncFlowOperation {
 
 
 	@Override
-	public SiAsyncTask createTask() { 
+	public AsyncSiTask createTask() { 
 		return new Task();
 	}
 }
