@@ -1,10 +1,10 @@
 package com.s8.stack.servers.xenon.flow;
 
-import com.s8.arch.fluor.S8OutputProcessor;
-import com.s8.arch.fluor.outputs.RepoCreationS8AsyncOutput;
+import com.s8.api.flow.S8OutputProcessor;
+import com.s8.api.flow.outputs.RepoCreationS8AsyncOutput;
+import com.s8.api.objects.repo.RepoS8Object;
 import com.s8.arch.silicon.async.AsyncSiTask;
 import com.s8.arch.silicon.async.MthProfile;
-import com.s8.io.bohr.neodymium.object.NdObject;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
 public class CreateRepoOp extends XeAsyncFlowOperation {
@@ -29,7 +29,7 @@ public class CreateRepoOp extends XeAsyncFlowOperation {
 	
 	public final String mainBranchName;
 	
-	public final NdObject[] objects;
+	public final RepoS8Object[] objects;
 	
 	public final String initialCommitComment;
 	
@@ -52,7 +52,7 @@ public class CreateRepoOp extends XeAsyncFlowOperation {
 			String repositoryAddress, 
 			String repositoryInfo,
 			String mainBranchName,
-			NdObject[] objects,
+			RepoS8Object[] objects,
 			String initialCommitComment,
 			S8OutputProcessor<RepoCreationS8AsyncOutput> onCommitted, 
 			long options) {

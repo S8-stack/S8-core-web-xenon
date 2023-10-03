@@ -1,11 +1,11 @@
 package com.s8.stack.servers.xenon.flow;
 
-import com.s8.arch.fluor.S8OutputProcessor;
-import com.s8.arch.fluor.S8User;
-import com.s8.arch.fluor.outputs.PutUserS8AsyncOutput;
+import com.s8.api.flow.S8OutputProcessor;
+import com.s8.api.flow.S8User;
+import com.s8.api.flow.outputs.PutUserS8AsyncOutput;
+import com.s8.api.objects.table.TableS8Object;
 import com.s8.arch.silicon.async.AsyncSiTask;
 import com.s8.arch.silicon.async.MthProfile;
-import com.s8.io.bohr.beryllium.object.BeObject;
 import com.s8.stack.servers.xenon.XenonWebServer;
 
 class PutUserOp extends XeAsyncFlowOperation {
@@ -38,7 +38,7 @@ class PutUserOp extends XeAsyncFlowOperation {
 
 			@Override
 			public void run() {
-				server.userDb.put(0L, (BeObject) user, 
+				server.userDb.put(0L, (TableS8Object) user, 
 						output -> {
 							onInserted.run(output);
 							flow.roll(true);

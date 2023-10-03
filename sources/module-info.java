@@ -13,7 +13,7 @@ module com.s8.web.xenon {
 	
 	/* </xenon> */
 
-	
+	requires transitive com.s8.api;
 	
 	requires transitive com.s8.io.bytes;
 	requires transitive com.s8.io.bohr.atom;

@@ -1,13 +1,13 @@
 package com.s8.stack.servers.xenon;
 
-import com.s8.arch.fluor.S8User;
-import com.s8.io.bohr.atom.annotations.S8Field;
-import com.s8.io.bohr.atom.annotations.S8ObjectType;
-import com.s8.io.bohr.beryllium.object.BeObject;
+import com.s8.api.flow.S8User;
+import com.s8.api.objects.annotations.S8Field;
+import com.s8.api.objects.annotations.S8ObjectType;
+import com.s8.api.objects.table.TableS8Object;
 
 
 @S8ObjectType(name = "base-s8-user")
-public class XeUser extends BeObject implements S8User {
+public class XeUser extends TableS8Object implements S8User {
 	
 	
 	@S8Field(name = "display-name")

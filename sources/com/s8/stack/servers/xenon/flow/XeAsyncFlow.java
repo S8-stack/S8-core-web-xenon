@@ -1,23 +1,23 @@
 package com.s8.stack.servers.xenon.flow;
 
-import com.s8.arch.fluor.S8AsyncFlow;
-import com.s8.arch.fluor.S8CodeBlock;
-import com.s8.arch.fluor.S8Filter;
-import com.s8.arch.fluor.S8OutputProcessor;
-import com.s8.arch.fluor.S8User;
-import com.s8.arch.fluor.delivery.S8WebResourceGenerator;
-import com.s8.arch.fluor.outputs.BranchCreationS8AsyncOutput;
-import com.s8.arch.fluor.outputs.BranchExposureS8AsyncOutput;
-import com.s8.arch.fluor.outputs.BranchVersionS8AsyncOutput;
-import com.s8.arch.fluor.outputs.GetUserS8AsyncOutput;
-import com.s8.arch.fluor.outputs.ObjectsListS8AsyncOutput;
-import com.s8.arch.fluor.outputs.PutUserS8AsyncOutput;
-import com.s8.arch.fluor.outputs.RepoCreationS8AsyncOutput;
-import com.s8.arch.fluor.outputs.RepositoryMetadataS8AsyncOutput;
-import com.s8.arch.fluor.outputs.SpaceExposureS8AsyncOutput;
-import com.s8.arch.fluor.outputs.SpaceVersionS8AsyncOutput;
+import com.s8.api.flow.S8AsyncFlow;
+import com.s8.api.flow.S8CodeBlock;
+import com.s8.api.flow.S8Filter;
+import com.s8.api.flow.S8OutputProcessor;
+import com.s8.api.flow.S8User;
+import com.s8.api.flow.delivery.S8WebResourceGenerator;
+import com.s8.api.flow.outputs.BranchCreationS8AsyncOutput;
+import com.s8.api.flow.outputs.BranchExposureS8AsyncOutput;
+import com.s8.api.flow.outputs.BranchVersionS8AsyncOutput;
+import com.s8.api.flow.outputs.GetUserS8AsyncOutput;
+import com.s8.api.flow.outputs.ObjectsListS8AsyncOutput;
+import com.s8.api.flow.outputs.PutUserS8AsyncOutput;
+import com.s8.api.flow.outputs.RepoCreationS8AsyncOutput;
+import com.s8.api.flow.outputs.RepositoryMetadataS8AsyncOutput;
+import com.s8.api.flow.outputs.SpaceExposureS8AsyncOutput;
+import com.s8.api.flow.outputs.SpaceVersionS8AsyncOutput;
+import com.s8.api.objects.repo.RepoS8Object;
 import com.s8.arch.silicon.SiliconEngine;
-import com.s8.io.bohr.neodymium.object.NdObject;
 import com.s8.io.bohr.neon.core.NeBranch;
 import com.s8.stack.arch.helium.http2.messages.HTTP2_Message;
 import com.s8.stack.servers.xenon.XeUser;
@@ -264,7 +264,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 		pushOperation(new CreateRepoOp(server, this, 
 				repositoryName, repositoryAddress, repositoryInfo, 
 				mainBranchName,
-				(NdObject[]) objects, initialCommitComment,
+				(RepoS8Object[]) objects, initialCommitComment,
 				onCreated, options));
 		return this;
 	}

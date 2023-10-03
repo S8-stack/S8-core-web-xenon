@@ -1,6 +1,6 @@
 package com.s8.stack.servers.xenon;
 
-import com.s8.arch.fluor.S8AsyncFlow;
+import com.s8.api.flow.S8AsyncFlow;
 import com.s8.io.bohr.neon.core.NeBranch;
 
 @FunctionalInterface
