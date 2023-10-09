@@ -7,16 +7,16 @@
 	<property name="java-sources" value="/Users/pc/qx/git/com.s8.stack/mod-sources" />
 	<property name="web-sources" value="/Users/pc/qx/git/com.s8.stack/web-sources" />
 	<property name="jar-path" value="${stack}/${name}.jar" />
-	<property name="d0" value="${stack}/s8-io-xml.jar" />
-	<property name="d1" value="${stack}/s8-io-joos.jar" />
-	<property name="d2" value="${stack}/s8-io-bytes.jar" />
-	<property name="d3" value="${stack}//s8-io-csv.jar" />
-	<property name="d4" value="${stack}/s8-io-bohr-atom.jar" />
-	<property name="d5" value="${stack}/s8-io-bohr-beryllium.jar" />
-	<property name="d6" value="${stack}/s8-io-bohr-lithium.jar" />
-	<property name="d7" value="${stack}/s8-io-bohr-neodymium.jar" />
-	<property name="d8" value="${stack}/s8-io-bohr-neon.jar" />
-	<property name="d9" value="${stack}/s8-arch-fluor.jar" />
+	<property name="d0" value="${stack}/s8-api.jar" />
+	<property name="d1" value="${stack}/s8-io-xml.jar" />
+	<property name="d2" value="${stack}/s8-io-joos.jar" />
+	<property name="d3" value="${stack}/s8-io-bytes.jar" />
+	<property name="d4" value="${stack}//s8-io-csv.jar" />
+	<property name="d5" value="${stack}/s8-io-bohr-atom.jar" />
+	<property name="d6" value="${stack}/s8-io-bohr-beryllium.jar" />
+	<property name="d7" value="${stack}/s8-io-bohr-lithium.jar" />
+	<property name="d8" value="${stack}/s8-io-bohr-neodymium.jar" />
+	<property name="d9" value="${stack}/s8-io-bohr-neon.jar" />
 	<property name="d10" value="${stack}/s8-arch-silicon.jar" />
 	<property name="d11" value="${stack}/s8-arch-magnesium.jar" />
 	<property name="d12" value="${stack}/s8-web-helium.jar" />

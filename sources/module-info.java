@@ -28,5 +28,5 @@ module com.s8.web.xenon {
 	requires transitive com.s8.io.bohr.lithium;
 	requires transitive com.s8.io.bohr.neodymium;
 	requires transitive com.s8.arch.magnesium;
-	requires com.s8.arch.fluor;
+	
 }
