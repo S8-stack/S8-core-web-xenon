@@ -225,7 +225,8 @@ public class XeWebConnection extends HTTP2_Connection {
 	 * @param response
 	 */
 	private void serveBoot(ByteInflow inflow, HTTP2_Message response) {
-		if(status == XeSessionStatus.LOGGED_IN) {
+		if(!mode.isLogginRequired 
+				|| (mode.isLogginRequired && status == XeSessionStatus.LOGGED_IN)) {
 			ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
 
 				public @Override String describe() {
