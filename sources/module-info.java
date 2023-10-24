@@ -8,8 +8,15 @@
 module com.s8.web.xenon {
 	
 	/* <xenon> */
-	exports com.s8.stack.servers.xenon;
-	exports com.s8.stack.servers.xenon.flow;
+	
+	
+	exports com.s8.web.xenon;
+	
+	exports com.s8.web.xenon.config;
+	exports com.s8.web.xenon.sessions;
+
+	exports com.s8.web.xenon.flow;
+	
 	
 	/* </xenon> */
 

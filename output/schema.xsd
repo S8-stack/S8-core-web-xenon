@@ -5,7 +5,7 @@
  xmlns:tns="http://s8.com"
  elementFormDefault="qualified">
 	<xs:element name="sources" type="tns:com.s8.web.carbon.build.sources.WebSources"/>
-	<xs:element name="S8-Xenon-server" type="tns:com.s8.stack.servers.xenon.XenonConfiguration"/>
+	<xs:element name="S8-Xenon-server" type="tns:com.s8.web.xenon.config.XeConfiguration"/>
 	<xs:element name="HTTP2_WebConfiguration" type="tns:com.s8.stack.arch.helium.http2.HTTP2_WebConfiguration"/>
 	<xs:element name="SSL_WebConfiguration" type="tns:com.s8.stack.arch.helium.ssl.SSL_WebConfiguration"/>
 	<xs:element name="SiliconAppConfiguration" type="tns:com.s8.arch.silicon.SiliconConfiguration"/>
@@ -31,6 +31,10 @@
 		</xs:sequence>
 		<xs:attribute name="frag-length" type="xs:string"/>
 		<xs:attribute name="cache" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:complexType name="com.s8.arch.silicon.clock.ClockSiModuleConfig">
+		<xs:attribute name="tick" type="xs:string"/>
 	</xs:complexType>
 
 	<xs:complexType name="com.s8.web.carbon.build.filters.basics.JSON_Filter">
@@ -72,9 +76,25 @@
 		</xs:sequence>
 	</xs:complexType>
 
-	<xs:complexType name="com.s8.arch.silicon.watch.WatchUnitConfig">
-		<xs:attribute name="isVerbose" type="xs:string"/>
-		<xs:attribute name="n-threads" type="xs:string"/>
+	<xs:complexType name="com.s8.web.xenon.config.XeConfiguration">
+		<xs:sequence>
+		<xs:choice maxOccurs="unbounded" minOccurs="1">
+			<xs:element name="databases" type="tns:com.s8.arch.magnesium.service.MgConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="MagnesiumDbConfiguration" type="tns:com.s8.arch.magnesium.service.MgConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="web-sources_CarbonWebServiceConfiguration" type="tns:com.s8.web.carbon.web.CarbonWebService-Config" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="engine_SiliconAppConfiguration" type="tns:com.s8.arch.silicon.SiliconConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="CarbonWebServiceConfiguration" type="tns:com.s8.web.carbon.web.CarbonWebService-Config" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="databases_MagnesiumDbConfiguration" type="tns:com.s8.arch.magnesium.service.MgConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="mode" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="web-sources" type="tns:com.s8.web.carbon.web.CarbonWebService-Config" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="web" type="tns:com.s8.stack.arch.helium.http2.HTTP2_WebConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="engine" type="tns:com.s8.arch.silicon.SiliconConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="web_HTTP2_WebConfiguration" type="tns:com.s8.stack.arch.helium.http2.HTTP2_WebConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="HTTP2_WebConfiguration" type="tns:com.s8.stack.arch.helium.http2.HTTP2_WebConfiguration" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="HTTP1.1_redirection" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="SiliconAppConfiguration" type="tns:com.s8.arch.silicon.SiliconConfiguration" minOccurs="0" maxOccurs="unbounded" />
+		</xs:choice>
+		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="com.s8.web.carbon.build.filters.basics.PNG_Filter">
@@ -188,6 +208,23 @@
 		</xs:sequence>
 	</xs:complexType>
 
+	<xs:complexType name="com.s8.arch.silicon.async.AsyncSiModuleConfig">
+		<xs:sequence>
+		<xs:choice maxOccurs="unbounded" minOccurs="1">
+			<xs:element name="ProfileMappingBuilder" type="tns:com.s8.arch.silicon.async.ProfileMappingBuilder" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="map_ProfileMappingBuilder" type="tns:com.s8.arch.silicon.async.ProfileMappingBuilder" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="map" type="tns:com.s8.arch.silicon.async.ProfileMappingBuilder" minOccurs="0" maxOccurs="unbounded" />
+		</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="n-threads" type="xs:string"/>
+		<xs:attribute name="queue-capacity" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:complexType name="com.s8.arch.silicon.watch.WatchSiModuleConfig">
+		<xs:attribute name="isVerbose" type="xs:string"/>
+		<xs:attribute name="n-threads" type="xs:string"/>
+	</xs:complexType>
+
 	<xs:complexType name="com.s8.web.carbon.build.sources.WebSources">
 		<xs:sequence>
 		<xs:choice maxOccurs="unbounded" minOccurs="1">
@@ -243,22 +280,18 @@
 		<xs:attribute name="cache" type="xs:string"/>
 	</xs:complexType>
 
-	<xs:complexType name="com.s8.arch.silicon.clock.ClockUnitConfig">
-		<xs:attribute name="tick" type="xs:string"/>
-	</xs:complexType>
-
 	<xs:complexType name="com.s8.arch.silicon.SiliconConfiguration">
 		<xs:sequence>
 		<xs:choice maxOccurs="unbounded" minOccurs="1">
-			<xs:element name="T3-unit" type="tns:com.s8.arch.silicon.clock.ClockUnitConfig" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="T3UnitConfig" type="tns:com.s8.arch.silicon.clock.ClockUnitConfig" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="T2-unit_T2UnitConfig" type="tns:com.s8.arch.silicon.watch.WatchUnitConfig" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="T2UnitConfig" type="tns:com.s8.arch.silicon.watch.WatchUnitConfig" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="T3-unit_T3UnitConfig" type="tns:com.s8.arch.silicon.clock.ClockUnitConfig" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="T1-unit_T1UnitConfig" type="tns:com.s8.arch.silicon.async.AsyncUnitConfig" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="T1-unit" type="tns:com.s8.arch.silicon.async.AsyncUnitConfig" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="T2-unit" type="tns:com.s8.arch.silicon.watch.WatchUnitConfig" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="T1UnitConfig" type="tns:com.s8.arch.silicon.async.AsyncUnitConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T3-unit" type="tns:com.s8.arch.silicon.clock.ClockSiModuleConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T3UnitConfig" type="tns:com.s8.arch.silicon.clock.ClockSiModuleConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T2-unit_T2UnitConfig" type="tns:com.s8.arch.silicon.watch.WatchSiModuleConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T2UnitConfig" type="tns:com.s8.arch.silicon.watch.WatchSiModuleConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T3-unit_T3UnitConfig" type="tns:com.s8.arch.silicon.clock.ClockSiModuleConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T1-unit_T1UnitConfig" type="tns:com.s8.arch.silicon.async.AsyncSiModuleConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T1-unit" type="tns:com.s8.arch.silicon.async.AsyncSiModuleConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T2-unit" type="tns:com.s8.arch.silicon.watch.WatchSiModuleConfig" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="T1UnitConfig" type="tns:com.s8.arch.silicon.async.AsyncSiModuleConfig" minOccurs="0" maxOccurs="unbounded" />
 		</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
@@ -321,26 +354,6 @@
 		<xs:attribute name="cache" type="xs:string"/>
 	</xs:complexType>
 
-	<xs:complexType name="com.s8.stack.servers.xenon.XenonConfiguration">
-		<xs:sequence>
-		<xs:choice maxOccurs="unbounded" minOccurs="1">
-			<xs:element name="MagnesiumDbConfiguration" type="tns:com.s8.arch.magnesium.service.MgConfiguration" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="magnesium" type="tns:com.s8.arch.magnesium.service.MgConfiguration" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="CarbonWebServiceConfiguration" type="tns:com.s8.web.carbon.web.CarbonWebService-Config" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="silicon_SiliconAppConfiguration" type="tns:com.s8.arch.silicon.SiliconConfiguration" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="carbon_CarbonWebServiceConfiguration" type="tns:com.s8.web.carbon.web.CarbonWebService-Config" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="silicon" type="tns:com.s8.arch.silicon.SiliconConfiguration" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="web" type="tns:com.s8.stack.arch.helium.http2.HTTP2_WebConfiguration" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="carbon" type="tns:com.s8.web.carbon.web.CarbonWebService-Config" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="web_HTTP2_WebConfiguration" type="tns:com.s8.stack.arch.helium.http2.HTTP2_WebConfiguration" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="HTTP2_WebConfiguration" type="tns:com.s8.stack.arch.helium.http2.HTTP2_WebConfiguration" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="magnesium_MagnesiumDbConfiguration" type="tns:com.s8.arch.magnesium.service.MgConfiguration" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="HTTP1.1_redirection" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="SiliconAppConfiguration" type="tns:com.s8.arch.silicon.SiliconConfiguration" minOccurs="0" maxOccurs="unbounded" />
-		</xs:choice>
-		</xs:sequence>
-	</xs:complexType>
-
 	<xs:complexType name="com.s8.web.carbon.build.filters.basics.X_TextFilter">
 		<xs:sequence>
 		<xs:choice maxOccurs="unbounded" minOccurs="1">
@@ -387,18 +400,6 @@
 	<xs:complexType name="com.s8.web.carbon.build.pointers.basics.PNG_Builder" mixed="true">
 		<xs:attribute name="frag-length" type="xs:string"/>
 		<xs:attribute name="cache" type="xs:string"/>
-	</xs:complexType>
-
-	<xs:complexType name="com.s8.arch.silicon.async.AsyncUnitConfig">
-		<xs:sequence>
-		<xs:choice maxOccurs="unbounded" minOccurs="1">
-			<xs:element name="ProfileMappingBuilder" type="tns:com.s8.arch.silicon.async.ProfileMappingBuilder" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="map_ProfileMappingBuilder" type="tns:com.s8.arch.silicon.async.ProfileMappingBuilder" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="map" type="tns:com.s8.arch.silicon.async.ProfileMappingBuilder" minOccurs="0" maxOccurs="unbounded" />
-		</xs:choice>
-		</xs:sequence>
-		<xs:attribute name="n-threads" type="xs:string"/>
-		<xs:attribute name="queue-capacity" type="xs:string"/>
 	</xs:complexType>
 
 	<xs:complexType name="com.s8.web.carbon.build.pointers.basics.BasicWebAssetPointer" mixed="true">
