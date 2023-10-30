@@ -1,14 +1,14 @@
 
 
-import { InboardScreen } from '/s8-web-front/inboard/InboardScreen.js';
+import { InboardScreen } from '/s8-pkgs-ui-carbide/inboard/InboardScreen.js';
 
-import { ByteOutflow } from '/s8-io-bytes/ByteOutflow.js';
-import { ByteInflow } from '/s8-io-bytes/ByteInflow.js';
+import { ByteOutflow } from '/s8-core-io-bytes/ByteOutflow.js';
+import { ByteInflow } from '/s8-core-io-bytes/ByteInflow.js';
 
-import { S8 } from '/s8-io-bohr-atom/S8.js';
-import { NeBranch } from '/s8-io-bohr-neon/NeBranch.js';
+import { S8 } from '/s8-core-io-bohr-atom/S8.js';
+import { NeBranch } from '/s8-core-io-bohr-neon/NeBranch.js';
 
-import { XENON_RequestKeywords, XENON_ResponseKeywords } from '/s8-web-xenon/XeProtocol.js';
+import { XENON_RequestKeywords, XENON_ResponseKeywords } from '/s8-core-web-xenon/XeProtocol.js';
 
 
 

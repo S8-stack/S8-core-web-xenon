@@ -5,7 +5,7 @@
  * @author pierreconvert
  *
  */
-module com.s8.web.xenon {
+module com.s8.core.web.xenon {
 	
 	/* <xenon> */
 	
