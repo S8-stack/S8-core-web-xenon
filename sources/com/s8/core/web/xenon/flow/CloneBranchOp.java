@@ -89,7 +89,7 @@ public class CloneBranchOp extends XeAsyncFlowOperation {
 
 				}
 				else {
-					db.cloneBranch(0L, flow.user, repositoryAddress, branchId, version,  
+					db.cloneBranch(0L, flow.session.user, repositoryAddress, branchId, version,  
 							output -> { 
 								onCloned.run(output); 
 								flow.roll(true);

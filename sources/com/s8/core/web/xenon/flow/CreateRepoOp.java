@@ -101,7 +101,7 @@ public class CreateRepoOp extends XeAsyncFlowOperation {
 
 				}
 				else {
-					db.createRepository(0L, flow.user, 
+					db.createRepository(0L, flow.session.user, 
 							repositoryName,
 							repositoryAddress, 
 							repositoryInfo,

@@ -67,7 +67,7 @@ public class AccessSpaceOp extends XeAsyncFlowOperation {
 					flow.roll(true);
 				}
 				else { /* valid! */
-					db.accessSpace(0L, flow.user, spaceId, 
+					db.accessSpace(0L, flow.session.user, spaceId, 
 							exposure -> {
 								onAccessed.run(exposure);
 

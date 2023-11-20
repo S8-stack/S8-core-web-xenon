@@ -22,19 +22,39 @@ import com.s8.core.web.helium.http2.messages.HTTP2_Message;
 import com.s8.core.web.xenon.XeUser;
 import com.s8.core.web.xenon.XeWebServer;
 import com.s8.core.web.xenon.flow.delivery.XeDeliveryTask;
+import com.s8.core.web.xenon.sessions.XeWebSession;
 import com.s8.io.bohr.neon.core.NeBranch;
 
+
+/**
+ * 
+ */
 public class XeAsyncFlow implements S8AsyncFlow  {
 
-
+	/**
+	 * the light thread execution engine
+	 */
+	public final SiliconEngine ng;
+	
+	
+	/** 
+	 * the server 
+	 */
 	public final XeWebServer server;
 
-	public final SiliconEngine ng;
+	
+	/** 
+	 * The session 
+	 */
+	public final XeWebSession session;
 
-	public final XeUser user;
-
+	
+	/**
+	 * The branch
+	 */
 	public final NeBranch branch;
 
+	
 	public final HTTP2_Message response;
 
 
@@ -54,20 +74,20 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	 * 
 	 */
 	private XeFlowChain<XeAsyncFlowOperation> operations = new XeFlowChain<>();
-	
 
-	public XeAsyncFlow(XeWebServer server,
+
+	public XeAsyncFlow(
 			SiliconEngine ng, 
-			XeUser user,
+			XeWebServer server,
+			XeWebSession session,
 			NeBranch branch,
 			HTTP2_Message response) {
 		super();
-		this.server = server;
 		this.ng = ng;
-		this.user = user;
+		this.server = server;
+		this.session = session;
 		this.branch = branch;
 		this.response = response;
-
 	}
 
 
@@ -93,17 +113,17 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 		}
 	}
 
-	
+
 
 
 	@Override
 	public void play() {
-		
+
 		/* launch rolling */
 		roll(false);
 	}
-	
-	
+
+
 
 	/**
 	 * 
@@ -131,10 +151,10 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 		synchronized (lock) {
 
 			if(!isTerminated && isActive == isContinued) {
-				
+
 				if(!operations.isEmpty()) {
 					isActive = true;
-					
+
 					if(isContinued) {
 						/**
 						 * The operation that calls back this flow is still the head of operations
@@ -143,7 +163,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 						 */
 						operations.popHead();
 					}
-					
+
 					/*
 					 * Retrieve but not removed the head
 					 */
@@ -154,9 +174,9 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 					 * Immediately exit Syncchronized block after pushing the task
 					 * --> Leave time to avoid contention
 					 */
-					
-				
-					
+
+
+
 				}
 				else { // no more operation
 					isActive = false;
@@ -188,19 +208,24 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8User getMe() {
-		return user;
+		return session.user;
 	}
 	
-	
+	@Override
+	public void setMe(S8User user) {
+		session.user = (XeUser) user;
+	}
+
+
 	//private static class Operation
-	
+
 
 	@Override
 	public S8AsyncFlow getUser(String username, S8OutputProcessor<GetUserS8AsyncOutput> onRetrieved, long options) {
 		pushOperation(new GetUserOp(this, server.userDb, username, onRetrieved, options));	
 		return this;
 	}
-	
+
 	@Override
 	public S8AsyncFlow putUser(S8User user, S8OutputProcessor<PutUserS8AsyncOutput> onInserted, long options) {
 		pushOperation(new PutUserOp(this, server.userDb, user, onInserted, options));
@@ -242,7 +267,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 		pushOperation(new ExposeSpaceOp(this, server.spaceDb, spaceId, exposure, onRebased, options));
 		return this;
 	}
-	
+
 
 	@Override
 	public S8AsyncFlow exposeMySpace(Object[] exposure, S8OutputProcessor<SpaceVersionS8AsyncOutput> onRebased, long options) {
@@ -268,8 +293,8 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 				onCreated, options));
 		return this;
 	}
-	
-	
+
+
 
 
 
@@ -372,6 +397,8 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public void deliver(int load, S8WebResourceGenerator generator) {
 		ng.pushAsyncTask(new XeDeliveryTask(ng, response, generator));
 	}
+
+
 
 
 }

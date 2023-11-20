@@ -71,7 +71,7 @@ public class ExposeSpaceOp extends XeAsyncFlowOperation {
 
 				}
 				else {
-					db.exposeObjects(0, flow.user, spaceId, exposure, 
+					db.exposeObjects(0, flow.session.user, spaceId, exposure, 
 							output -> {
 								onRebased.run(output);
 

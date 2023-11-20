@@ -97,7 +97,7 @@ public class ForkBranchOp extends XeAsyncFlowOperation {
 
 				}
 				else {
-					db.forkBranch(0L, flow.user, repositoryAddress, 
+					db.forkBranch(0L, flow.session.user, repositoryAddress, 
 							originBranchId, originBranchVersion, 
 							targetBranchId, 
 							output -> { 

@@ -74,7 +74,7 @@ public class GetRepoMetadataOp extends XeAsyncFlowOperation {
 					
 				}
 				else {
-					db.getRepositoryMetadata(0L, flow.user, repositoryAddress, output -> {
+					db.getRepositoryMetadata(0L, flow.session.user, repositoryAddress, output -> {
 						onDone.run(output);
 						
 						/* continue */

@@ -3,15 +3,8 @@ package com.s8.core.web.xenon.protocol;
 public class XeRequestKeywords {
 
 
-	/* <sign-up> */
-	public static final int SIGN_UP = 0x12;
-	/* </sign-up> */
-
-	/* <log-in> */
-	public static final int  LOG_IN = 0x22;
 	
-	
-	public static final int  BOOT = 0x42;
+	public static final int  BOOT = 0x32;
 	/* </log-in> */
 
 	/* <func> */

@@ -80,7 +80,7 @@ public class CommitBranchOp extends XeAsyncFlowOperation {
 
 				}
 				else {
-					db.commitBranch(0L, flow.user, repositoryAddress, branchId, objects, comment,
+					db.commitBranch(0L, flow.session.user, repositoryAddress, branchId, objects, comment,
 							output -> { 
 								onCommitted.run(output); 
 								
