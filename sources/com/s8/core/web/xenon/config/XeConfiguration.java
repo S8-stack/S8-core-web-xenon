@@ -13,8 +13,8 @@ import com.s8.core.io.xml.annotations.XML_Type;
 import com.s8.core.io.xml.codebase.XML_Codebase;
 import com.s8.core.io.xml.handler.type.XML_TypeCompilationException;
 import com.s8.core.io.xml.parser.XML_ParsingException;
+import com.s8.core.web.carbon.web.CarbonWebService;
 import com.s8.core.web.helium.http2.HTTP2_WebConfiguration;
-import com.s8.web.carbon.web.CarbonWebService;
 
 @XML_Type(root=true, name = "S8-Xenon-server")
 public class XeConfiguration {

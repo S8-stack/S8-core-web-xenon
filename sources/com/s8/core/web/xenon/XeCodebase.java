@@ -1,11 +1,11 @@
 package com.s8.core.web.xenon;
 
 import com.s8.api.exceptions.S8BuildException;
-import com.s8.io.bohr.beryllium.codebase.BeCodebase;
-import com.s8.io.bohr.beryllium.exception.BeBuildException;
-import com.s8.io.bohr.lithium.codebase.LiCodebase;
-import com.s8.io.bohr.neodymium.codebase.NdCodebase;
-import com.s8.io.bohr.neodymium.exceptions.NdBuildException;
+import com.s8.core.bohr.beryllium.codebase.BeCodebase;
+import com.s8.core.bohr.beryllium.exception.BeBuildException;
+import com.s8.core.bohr.lithium.codebase.LiCodebase;
+import com.s8.core.bohr.neodymium.codebase.NdCodebase;
+import com.s8.core.bohr.neodymium.exceptions.NdBuildException;
 
 
 /**
