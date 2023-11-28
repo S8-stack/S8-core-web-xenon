@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.s8.arch.magnesium.service.MgConfiguration;
+import com.s8.core.arch.magnesium.service.MgConfiguration;
 import com.s8.core.arch.silicon.SiliconConfiguration;
 import com.s8.core.io.xml.annotations.XML_SetElement;
 import com.s8.core.io.xml.annotations.XML_Type;

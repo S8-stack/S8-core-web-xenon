@@ -6,7 +6,7 @@ import com.s8.api.flow.S8Filter;
 import com.s8.api.flow.S8OutputProcessor;
 import com.s8.api.flow.S8User;
 import com.s8.api.flow.outputs.ObjectsListS8AsyncOutput;
-import com.s8.arch.magnesium.databases.record.RecordsMgDatabase;
+import com.s8.core.arch.magnesium.databases.record.RecordsMgDatabase;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
 

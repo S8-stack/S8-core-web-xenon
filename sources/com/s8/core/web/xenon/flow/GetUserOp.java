@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.s8.api.flow.S8OutputProcessor;
 import com.s8.api.flow.outputs.GetUserS8AsyncOutput;
-import com.s8.arch.magnesium.databases.record.RecordsMgDatabase;
+import com.s8.core.arch.magnesium.databases.record.RecordsMgDatabase;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
 

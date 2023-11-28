@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Path;
 
-import com.s8.arch.magnesium.databases.record.RecordsMgDatabase;
-import com.s8.arch.magnesium.databases.repository.store.RepoMgDatabase;
-import com.s8.arch.magnesium.databases.space.store.SpaceMgDatabase;
-import com.s8.arch.magnesium.service.MgConfiguration;
+import com.s8.core.arch.magnesium.databases.record.RecordsMgDatabase;
+import com.s8.core.arch.magnesium.databases.repository.store.RepoMgDatabase;
+import com.s8.core.arch.magnesium.databases.space.store.SpaceMgDatabase;
+import com.s8.core.arch.magnesium.service.MgConfiguration;
 import com.s8.core.arch.silicon.SiliconEngine;
 import com.s8.core.io.xml.codebase.XML_Codebase;
 import com.s8.core.web.carbon.web.CarbonWebService;
