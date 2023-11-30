@@ -2,8 +2,7 @@ package com.s8.core.web.xenon.flow;
 
 import java.io.IOException;
 
-import com.s8.api.flow.S8OutputProcessor;
-import com.s8.api.flow.outputs.BranchExposureS8AsyncOutput;
+import com.s8.api.flow.repository.requests.CloneBranchS8Request;
 import com.s8.core.arch.magnesium.databases.repository.store.RepoMgDatabase;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
@@ -19,21 +18,7 @@ public class CloneBranchOp extends XeAsyncFlowOperation {
 
 	public final RepoMgDatabase db;
 	
-	public final String repositoryAddress;
-
-
-	public final String branchId;
-
-
-	public final long version;
-
-
-	public final S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned;
-
-	
-	public final long options;
-	
-	
+	public final CloneBranchS8Request request;
 	
 
 	/**
@@ -48,19 +33,11 @@ public class CloneBranchOp extends XeAsyncFlowOperation {
 	 */
 	public CloneBranchOp(XeAsyncFlow flow, 
 			RepoMgDatabase db,
-			String repositoryAddress, 
-			String branchId,
-			long version, 
-			S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned, 
-			long options) {
+			CloneBranchS8Request request) {
 		
 		super(flow);
 		this.db = db;
-		this.repositoryAddress = repositoryAddress;
-		this.branchId = branchId;
-		this.version = version;
-		this.onCloned = onCloned;
-		this.options = options;
+		this.request = request;
 	}
 
 
@@ -79,22 +56,16 @@ public class CloneBranchOp extends XeAsyncFlowOperation {
 				if(db == null) {
 
 					/* create output */
-					BranchExposureS8AsyncOutput output = new BranchExposureS8AsyncOutput();
-					output.hasException = true;
-					output.exception = new IOException("Repo DB is unavailable in this context");
-					onCloned.run(output);
+					request.onError(new IOException("Repo DB is unavailable in this context"));
 
 					/* continue immediately */
 					flow.roll(true);					
 
 				}
 				else {
-					db.cloneBranch(0L, flow.session.user, repositoryAddress, branchId, version,  
-							output -> { 
-								onCloned.run(output); 
-								flow.roll(true);
-							},
-							options);	
+					db.cloneBranch(0L, flow.session.user, 
+							() -> flow.roll(true), /* callback: continue after request has been performed */
+							request);	
 				}
 			}
 			

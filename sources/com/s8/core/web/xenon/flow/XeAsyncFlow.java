@@ -2,21 +2,22 @@ package com.s8.core.web.xenon.flow;
 
 import com.s8.api.flow.S8AsyncFlow;
 import com.s8.api.flow.S8CodeBlock;
-import com.s8.api.flow.S8Filter;
-import com.s8.api.flow.S8OutputProcessor;
 import com.s8.api.flow.S8User;
 import com.s8.api.flow.delivery.S8WebResourceGenerator;
-import com.s8.api.flow.outputs.BranchCreationS8AsyncOutput;
-import com.s8.api.flow.outputs.BranchExposureS8AsyncOutput;
-import com.s8.api.flow.outputs.BranchVersionS8AsyncOutput;
-import com.s8.api.flow.outputs.GetUserS8AsyncOutput;
-import com.s8.api.flow.outputs.ObjectsListS8AsyncOutput;
-import com.s8.api.flow.outputs.PutUserS8AsyncOutput;
-import com.s8.api.flow.outputs.RepoCreationS8AsyncOutput;
-import com.s8.api.flow.outputs.RepositoryMetadataS8AsyncOutput;
-import com.s8.api.flow.outputs.SpaceExposureS8AsyncOutput;
-import com.s8.api.flow.outputs.SpaceVersionS8AsyncOutput;
-import com.s8.api.objects.repo.RepoS8Object;
+import com.s8.api.flow.record.objects.RecordS8Object;
+import com.s8.api.flow.record.requests.GetRecordS8Request;
+import com.s8.api.flow.record.requests.PutRecordS8Request;
+import com.s8.api.flow.record.requests.SelectRecordsS8Request;
+import com.s8.api.flow.repository.requests.CloneBranchS8Request;
+import com.s8.api.flow.repository.requests.CommitBranchS8Request;
+import com.s8.api.flow.repository.requests.CreateRepositoryS8Request;
+import com.s8.api.flow.repository.requests.ForkBranchS8Request;
+import com.s8.api.flow.repository.requests.ForkRepositoryS8Request;
+import com.s8.api.flow.repository.requests.GetBranchMetadataS8Request;
+import com.s8.api.flow.repository.requests.GetRepositoryMetadataS8Request;
+import com.s8.api.flow.space.requests.AccessSpaceS8Request;
+import com.s8.api.flow.space.requests.CreateSpaceS8Request;
+import com.s8.api.flow.space.requests.ExposeSpaceS8Request;
 import com.s8.core.arch.silicon.SiliconEngine;
 import com.s8.core.web.helium.http2.messages.HTTP2_Message;
 import com.s8.core.web.xenon.XeUser;
@@ -35,26 +36,26 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	 * the light thread execution engine
 	 */
 	public final SiliconEngine ng;
-	
-	
+
+
 	/** 
 	 * the server 
 	 */
 	public final XeWebServer server;
 
-	
+
 	/** 
 	 * The session 
 	 */
 	public final XeWebSession session;
 
-	
+
 	/**
 	 * The branch
 	 */
 	public final NeBranch branch;
 
-	
+
 	public final HTTP2_Message response;
 
 
@@ -169,14 +170,13 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 					 */
 					XeAsyncFlowOperation operation = operations.getHead();					
 
+
 					ng.pushAsyncTask(operation.createTask());
 					/*
 					 * Immediately exit Syncchronized block after pushing the task
 					 * --> Leave time to avoid contention
 					 */
-
-
-
+					
 				}
 				else { // no more operation
 					isActive = false;
@@ -210,7 +210,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public S8User getMe() {
 		return session.user;
 	}
-	
+
 	@Override
 	public void setMe(S8User user) {
 		session.user = (XeUser) user;
@@ -221,23 +221,21 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 	@Override
-	public S8AsyncFlow getUser(String username, S8OutputProcessor<GetUserS8AsyncOutput> onRetrieved, long options) {
-		pushOperation(new GetUserOp(this, server.userDb, username, onRetrieved, options));	
+	public S8AsyncFlow then(GetRecordS8Request request) {
+		pushOperation(new GetUserOp(this, server.userDb, request));	
 		return this;
 	}
 
 	@Override
-	public S8AsyncFlow putUser(S8User user, S8OutputProcessor<PutUserS8AsyncOutput> onInserted, long options) {
-		pushOperation(new PutUserOp(this, server.userDb, user, onInserted, options));
+	public S8AsyncFlow then(PutRecordS8Request request) {
+		pushOperation(new PutUserOp(this, server.userDb, request));
 		return this;
 	}
 
 
 	@Override
-	public S8AsyncFlow selectUsers(S8Filter<S8User> filter, 
-			S8OutputProcessor<ObjectsListS8AsyncOutput<S8User>> onSelected, 
-			long options) {
-		pushOperation(new SelectUsersOp(this, server.userDb, filter, onSelected, options));
+	public <T extends RecordS8Object> S8AsyncFlow then(SelectRecordsS8Request<T> request) {
+		pushOperation(new SelectUsersOp<T>(this, server.userDb,request));
 		return this;
 	}
 
@@ -247,50 +245,25 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 	@Override
-	public S8AsyncFlow accessSpace(String spaceId, S8OutputProcessor<SpaceExposureS8AsyncOutput> onAccessed, long options) {
-		pushOperation(new AccessSpaceOp(this, server.spaceDb, spaceId, onAccessed, options));
-		return this;
-	}
-
-
-
-	@Override
-	public S8AsyncFlow accessMySpace(S8OutputProcessor<SpaceExposureS8AsyncOutput> onAccessed, long options) {
-		pushOperation(new AccessSpaceOp(this, server.spaceDb, getMySpaceId(), onAccessed, options));
+	public S8AsyncFlow then(AccessSpaceS8Request request) {
+		pushOperation(new AccessSpaceOp(this, server.spaceDb, request));
 		return this;
 	}
 
 
 	@Override
-	public S8AsyncFlow exposeSpace(String spaceId, Object[] exposure, S8OutputProcessor<SpaceVersionS8AsyncOutput> onRebased,
-			long options) {
-		pushOperation(new ExposeSpaceOp(this, server.spaceDb, spaceId, exposure, onRebased, options));
-		return this;
-	}
-
-
-	@Override
-	public S8AsyncFlow exposeMySpace(Object[] exposure, S8OutputProcessor<SpaceVersionS8AsyncOutput> onRebased, long options) {
-		pushOperation(new ExposeSpaceOp(this, server.spaceDb, getMySpaceId(), exposure, onRebased, options));
+	public S8AsyncFlow then(ExposeSpaceS8Request request) {
+		pushOperation(new ExposeSpaceOp(this, server.spaceDb, request));
 		return this;
 	}
 
 
 
+
+
 	@Override
-	public S8AsyncFlow createRepository(
-			String repositoryName,
-			String repositoryAddress,
-			String repositoryInfo, 
-			String mainBranchName,
-			Object[] objects,
-			String initialCommitComment,
-			S8OutputProcessor<RepoCreationS8AsyncOutput> onCreated, long options) {
-		pushOperation(new CreateRepoOp(this, server.repoDb, 
-				repositoryName, repositoryAddress, repositoryInfo, 
-				mainBranchName,
-				(RepoS8Object[]) objects, initialCommitComment,
-				onCreated, options));
+	public S8AsyncFlow then(CreateRepositoryS8Request request) {
+		pushOperation(new CreateRepoOp(this, server.repoDb, request));
 		return this;
 	}
 
@@ -300,9 +273,24 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 	@Override
-	public S8AsyncFlow getRepositoryMetadata(String repositoryAddress,
-			S8OutputProcessor<RepositoryMetadataS8AsyncOutput> onForked, long options) {
-		pushOperation(new GetRepoMetadataOp(this, server.repoDb, repositoryAddress, onForked, options));
+	public S8AsyncFlow then(GetRepositoryMetadataS8Request request) {
+		pushOperation(new GetRepoMetadataOp(this, server.repoDb, request));
+		return this;
+	}
+
+
+
+	@Override
+	public S8AsyncFlow then(ForkBranchS8Request request) {
+		pushOperation(new ForkBranchOp(this, server.repoDb, request));
+		return this;
+	}
+
+
+
+	@Override
+	public S8AsyncFlow then(ForkRepositoryS8Request request) {
+		pushOperation(new ForkRepoOp(this, server.repoDb, request));
 		return this;
 	}
 
@@ -311,66 +299,16 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 	@Override
-	public S8AsyncFlow forkBranch(String repositoryAddress, 
-			String originBranchId, long originBranchVersion, String targetBranchId,
-			S8OutputProcessor<BranchCreationS8AsyncOutput> onCreated, long options) {
-		pushOperation(new ForkBranchOp(this, server.repoDb, repositoryAddress, 
-				originBranchId, originBranchVersion, targetBranchId,
-				onCreated, options));
-		return this;
-	}
-
-
-
-
-
-
-	@Override
-	public S8AsyncFlow forkRepository(String originRepositoryAddress, 
-			String originBranchId, long originBranchVersion,
-			String targetRepositoryAddress,
-			S8OutputProcessor<BranchCreationS8AsyncOutput> onForked, long options) {
-		pushOperation(new ForkRepoOp(this, server.repoDb, 
-				originRepositoryAddress, 
-				originBranchId, 
-				originBranchVersion, 
-				targetRepositoryAddress,
-				onForked, 
-				options));
-		return this;
-	}
-
-
-
-
-
-	@Override
-	public S8AsyncFlow commitBranch(String repositoryAddress, String branchId, 
-			Object[] objects, String author, String comment,
-			S8OutputProcessor<BranchVersionS8AsyncOutput> onCommitted, long options) {
-		pushOperation(new CommitBranchOp(this, server.repoDb,
-				repositoryAddress, 
-				branchId, 
-				objects, 
-				author, 
-				comment,
-				onCommitted, 
-				options));
+	public S8AsyncFlow then(CommitBranchS8Request request) {
+		pushOperation(new CommitBranchOp(this, server.repoDb, request));
 		return this;
 	}
 
 
 
 	@Override
-	public S8AsyncFlow cloneBranch(String repositoryAddress, String branchId, long version,
-			S8OutputProcessor<BranchExposureS8AsyncOutput> onCloned, 
-			long options) {
-		pushOperation(new CloneBranchOp(this, server.repoDb,
-				repositoryAddress, 
-				branchId, 
-				version, 
-				onCloned, 
-				options));
+	public S8AsyncFlow then(CloneBranchS8Request request) {
+		pushOperation(new CloneBranchOp(this, server.repoDb, request));
 		return this;
 	}
 
@@ -398,6 +336,27 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 		ng.pushAsyncTask(new XeDeliveryTask(ng, response, generator));
 	}
 
+
+
+
+
+
+
+
+
+	@Override
+	public S8AsyncFlow then(CreateSpaceS8Request request) {
+		throw new RuntimeException("Not implemented yet");
+	}
+
+
+
+
+
+	@Override
+	public S8AsyncFlow then(GetBranchMetadataS8Request request) {
+		throw new RuntimeException("Not implemented yet");
+	}
 
 
 

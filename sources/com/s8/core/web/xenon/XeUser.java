@@ -1,13 +1,13 @@
 package com.s8.core.web.xenon;
 
+import com.s8.api.annotations.S8Field;
+import com.s8.api.annotations.S8ObjectType;
 import com.s8.api.flow.S8User;
-import com.s8.api.objects.annotations.S8Field;
-import com.s8.api.objects.annotations.S8ObjectType;
-import com.s8.api.objects.table.TableS8Object;
+import com.s8.api.flow.record.objects.RecordS8Object;
 
 
 @S8ObjectType(name = "base-s8-user")
-public class XeUser extends TableS8Object implements S8User {
+public class XeUser extends RecordS8Object implements S8User {
 	
 	
 	@S8Field(name = "display-name")

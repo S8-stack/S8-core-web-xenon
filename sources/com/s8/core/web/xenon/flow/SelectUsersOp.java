@@ -2,10 +2,8 @@ package com.s8.core.web.xenon.flow;
 
 import java.io.IOException;
 
-import com.s8.api.flow.S8Filter;
-import com.s8.api.flow.S8OutputProcessor;
-import com.s8.api.flow.S8User;
-import com.s8.api.flow.outputs.ObjectsListS8AsyncOutput;
+import com.s8.api.flow.record.objects.RecordS8Object;
+import com.s8.api.flow.record.requests.SelectRecordsS8Request;
 import com.s8.core.arch.magnesium.databases.record.RecordsMgDatabase;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
@@ -15,7 +13,7 @@ import com.s8.core.arch.silicon.async.MthProfile;
  * @author pierreconvert
  *
  */
-public class SelectUsersOp extends XeAsyncFlowOperation {
+public class SelectUsersOp<T extends RecordS8Object> extends XeAsyncFlowOperation {
 
 	
 	
@@ -24,15 +22,7 @@ public class SelectUsersOp extends XeAsyncFlowOperation {
 	/**
 	 * 
 	 */
-	public final S8Filter<S8User> filter;
-
-	
-	/**
-	 * 
-	 */
-	public final S8OutputProcessor<ObjectsListS8AsyncOutput<S8User>> onSelected;
-
-	public final long options;
+	public final SelectRecordsS8Request<T> request;
 
 	/**
 	 * 
@@ -44,14 +34,10 @@ public class SelectUsersOp extends XeAsyncFlowOperation {
 	 */
 	public SelectUsersOp(XeAsyncFlow flow, 
 			RecordsMgDatabase db,
-			S8Filter<S8User> filter,
-			S8OutputProcessor<ObjectsListS8AsyncOutput<S8User>> onSelected, 
-			long options) {
+			SelectRecordsS8Request<T> request) {
 		super(flow);
 		this.db = db;
-		this.filter = filter;
-		this.onSelected = onSelected;
-		this.options = options;
+		this.request = request;
 	}
 
 
@@ -66,20 +52,11 @@ public class SelectUsersOp extends XeAsyncFlowOperation {
 			@Override
 			public void run() {
 				if(db != null) {
-					db.select(0L, filter, 
-							output -> {
-								onSelected.run(output);
-								
-								/* continue */
-								flow.roll(true);
-							},
-							options);	
+					db.select(0L, () -> flow.roll(true), request);	
 				}
 				else {
-					ObjectsListS8AsyncOutput<S8User> output = new ObjectsListS8AsyncOutput<>();
-					output.exception = new IOException("User DB missing in this context");
-					output.hasException = true;
-					onSelected.run(output);
+					/* request */
+					request.onError(new IOException("User DB missing in this context"));
 					
 					/* continue */
 					flow.roll(true);

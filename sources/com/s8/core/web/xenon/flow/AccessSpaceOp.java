@@ -2,8 +2,8 @@ package com.s8.core.web.xenon.flow;
 
 import java.io.IOException;
 
-import com.s8.api.flow.S8OutputProcessor;
-import com.s8.api.flow.outputs.SpaceExposureS8AsyncOutput;
+import com.s8.api.flow.space.requests.AccessSpaceS8Request;
+import com.s8.api.flow.space.requests.AccessSpaceS8Request.Status;
 import com.s8.core.arch.magnesium.databases.space.store.SpaceMgDatabase;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
@@ -12,23 +12,13 @@ public class AccessSpaceOp extends XeAsyncFlowOperation {
 
 	public final SpaceMgDatabase db;
 
-	public final String spaceId;
-
-	public final S8OutputProcessor<SpaceExposureS8AsyncOutput> onAccessed;
-
-	public final long options;
+	public final AccessSpaceS8Request request;
 
 
-	public AccessSpaceOp(XeAsyncFlow flow, 
-			SpaceMgDatabase db,
-			String spaceId,
-			S8OutputProcessor<SpaceExposureS8AsyncOutput> onAccessed, 
-			long options) {
+	public AccessSpaceOp(XeAsyncFlow flow, SpaceMgDatabase db, AccessSpaceS8Request request) {
 		super(flow);
 		this.db = db;
-		this.spaceId = spaceId;
-		this.onAccessed = onAccessed;
-		this.options = options;
+		this.request = request;
 	}
 
 
@@ -41,40 +31,29 @@ public class AccessSpaceOp extends XeAsyncFlowOperation {
 
 			@Override
 			public void run() {
-				
+
 				/* check db */
 				if(db == null) {
 
 					/* create output */
-					SpaceExposureS8AsyncOutput output = new SpaceExposureS8AsyncOutput();
-					output.hasException = true;
-					output.exception = new IOException("Space DB is unavailable in this context");
-					onAccessed.run(output);
+					request.onFailed(new IOException("Space DB is unavailable in this context"));
 
 					/* continue immediately */
 					flow.roll(true);
 				}
 				/* check id */
-				else if(spaceId == null) {
+				else if(request.spaceId == null) {
 
 					/* create output */
-					SpaceExposureS8AsyncOutput output = new SpaceExposureS8AsyncOutput();
-					output.hasException = true;
-					output.exception = new IOException("space ID is invalid: "+spaceId);
-					onAccessed.run(output);
+					request.onAccessed(Status.INVALID_SPACE_ID, null);
 
 					/* continue immediately */
 					flow.roll(true);
 				}
 				else { /* valid! */
-					db.accessSpace(0L, flow.session.user, spaceId, 
-							exposure -> {
-								onAccessed.run(exposure);
-
-								/* continue */
-								flow.roll(true);
-							},
-							options); 
+					db.accessSpace(0L, flow.session.user, 
+							() -> flow.roll(true), /* callback: continue */
+							request); 
 				}
 			}
 			public @Override MthProfile profile() { return MthProfile.FX1; }
