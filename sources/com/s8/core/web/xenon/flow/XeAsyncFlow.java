@@ -4,6 +4,7 @@ import com.s8.api.flow.S8AsyncFlow;
 import com.s8.api.flow.S8CodeBlock;
 import com.s8.api.flow.S8User;
 import com.s8.api.flow.delivery.S8WebResourceGenerator;
+import com.s8.api.flow.mail.SendMailS8Request;
 import com.s8.api.flow.record.objects.RecordS8Object;
 import com.s8.api.flow.record.requests.GetRecordS8Request;
 import com.s8.api.flow.record.requests.PutRecordS8Request;
@@ -23,6 +24,7 @@ import com.s8.core.web.helium.http2.messages.HTTP2_Message;
 import com.s8.core.web.xenon.XeUser;
 import com.s8.core.web.xenon.XeWebServer;
 import com.s8.core.web.xenon.flow.delivery.XeDeliveryTask;
+import com.s8.core.web.xenon.flow.mail.SendMailOp;
 import com.s8.core.web.xenon.sessions.XeWebSession;
 import com.s8.io.bohr.neon.core.NeBranch;
 
@@ -138,7 +140,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	/**
 	 * Should nto be called when transitioning
 	 */
-	void roll(boolean isContinued) {
+	public void roll(boolean isContinued) {
 
 		/* 
 		 * Start rolling if not already rolling. Two cases:
@@ -218,6 +220,14 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 	//private static class Operation
+	
+
+
+	@Override
+	public S8AsyncFlow sendEMail(SendMailS8Request request) {
+		pushOperation(new SendMailOp(this, server.manganeseWebService, request));	
+		return this;
+	}
 
 
 	@Override
@@ -338,12 +348,6 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 
-
-
-
-
-
-
 	@Override
 	public S8AsyncFlow then(CreateSpaceS8Request request) {
 		throw new RuntimeException("Not implemented yet");
@@ -357,7 +361,6 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public S8AsyncFlow then(GetBranchMetadataS8Request request) {
 		throw new RuntimeException("Not implemented yet");
 	}
-
 
 
 }

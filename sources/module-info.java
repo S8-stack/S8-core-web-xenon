@@ -28,6 +28,7 @@ module com.s8.core.web.xenon {
 	
 	requires transitive com.s8.core.web.helium;
 	requires transitive com.s8.core.web.carbon;
+	requires transitive com.s8.core.web.manganese;
 	
 
 	requires transitive com.s8.core.bohr.atom;
@@ -37,5 +38,6 @@ module com.s8.core.web.xenon {
 	requires transitive com.s8.core.bohr.neodymium;
 	
 	requires transitive com.s8.core.arch.magnesium;
+	
 	
 }

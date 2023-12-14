@@ -16,6 +16,7 @@ import com.s8.core.web.helium.http1.pre.HTTP1_Redirection;
 import com.s8.core.web.helium.http2.HTTP2_Server;
 import com.s8.core.web.helium.http2.HTTP2_WebConfiguration;
 import com.s8.core.web.helium.rx.RxConnection;
+import com.s8.core.web.manganese.ManganeseWebService;
 import com.s8.core.web.xenon.config.XeConfiguration;
 import com.s8.core.web.xenon.config.XeMode;
 import com.s8.core.web.xenon.sessions.XeWebSession;
@@ -61,6 +62,7 @@ public class XeWebServer extends HTTP2_Server {
 	 */
 	public final CarbonWebService carbonWebService;
 
+	public final ManganeseWebService manganeseWebService;
 	
 	
 	public final RecordsMgDatabase userDb;
@@ -114,6 +116,11 @@ public class XeWebServer extends HTTP2_Server {
 		 */
 		carbonWebService = new CarbonWebService(siliconEngine, lexicon, configuration.carbon);
 		
+		
+		/**
+		 * Create manganse service
+		 */
+		manganeseWebService = new ManganeseWebService(configuration.manganese);	
 		
 		
 		/* create user database */

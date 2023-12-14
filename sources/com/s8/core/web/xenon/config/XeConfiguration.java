@@ -15,6 +15,7 @@ import com.s8.core.io.xml.handler.type.XML_TypeCompilationException;
 import com.s8.core.io.xml.parser.XML_ParsingException;
 import com.s8.core.web.carbon.web.CarbonWebService;
 import com.s8.core.web.helium.http2.HTTP2_WebConfiguration;
+import com.s8.core.web.manganese.ManganeseWebService;
 
 @XML_Type(root=true, name = "S8-Xenon-server")
 public class XeConfiguration {
@@ -46,6 +47,13 @@ public class XeConfiguration {
 	@XML_SetElement(tag = "web-sources")
 	public void setService(CarbonWebService.Config config) {
 		this.carbon = config;
+	}
+	
+	public ManganeseWebService.Config manganese;
+
+	@XML_SetElement(tag = "mail")
+	public void setMgService(ManganeseWebService.Config config) {
+		this.manganese = config;
 	}
 	
 	public MgConfiguration magnesium;
