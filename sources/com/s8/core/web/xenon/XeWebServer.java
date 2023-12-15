@@ -120,7 +120,8 @@ public class XeWebServer extends HTTP2_Server {
 		/**
 		 * Create manganse service
 		 */
-		manganeseWebService = new ManganeseWebService(configuration.manganese);	
+		manganeseWebService = configuration.manganese != null ? 
+				new ManganeseWebService(configuration.manganese) : null;	
 		
 		
 		/* create user database */
