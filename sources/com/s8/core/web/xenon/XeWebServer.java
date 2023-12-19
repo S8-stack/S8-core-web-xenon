@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Path;
 
-import com.s8.core.arch.magnesium.databases.record.RecordsMgDatabase;
 import com.s8.core.arch.magnesium.databases.repository.store.RepoMgDatabase;
 import com.s8.core.arch.magnesium.databases.space.store.SpaceMgDatabase;
+import com.s8.core.arch.magnesium.databases.table.TableMgDatabase;
 import com.s8.core.arch.magnesium.service.MgConfiguration;
 import com.s8.core.arch.silicon.SiliconEngine;
 import com.s8.core.io.xml.codebase.XML_Codebase;
@@ -65,7 +65,7 @@ public class XeWebServer extends HTTP2_Server {
 	public final ManganeseWebService manganeseWebService;
 	
 	
-	public final RecordsMgDatabase userDb;
+	public final TableMgDatabase userDb;
 	
 	public final SpaceMgDatabase spaceDb;
 	
@@ -129,7 +129,7 @@ public class XeWebServer extends HTTP2_Server {
 		
 		if(magnesium != null) {
 			if(magnesium.userDbConfigPathname != null) {
-				userDb = new RecordsMgDatabase(siliconEngine, 
+				userDb = new TableMgDatabase(siliconEngine, 
 						codebase.userCodebase, 
 						Path.of(magnesium.userDbConfigPathname));	
 			}

@@ -5,10 +5,6 @@ import com.s8.api.flow.S8CodeBlock;
 import com.s8.api.flow.S8User;
 import com.s8.api.flow.delivery.S8WebResourceGenerator;
 import com.s8.api.flow.mail.SendMailS8Request;
-import com.s8.api.flow.record.objects.RecordS8Object;
-import com.s8.api.flow.record.requests.GetRecordS8Request;
-import com.s8.api.flow.record.requests.PutRecordS8Request;
-import com.s8.api.flow.record.requests.SelectRecordsS8Request;
 import com.s8.api.flow.repository.requests.CloneBranchS8Request;
 import com.s8.api.flow.repository.requests.CommitBranchS8Request;
 import com.s8.api.flow.repository.requests.CreateRepositoryS8Request;
@@ -19,6 +15,10 @@ import com.s8.api.flow.repository.requests.GetRepositoryMetadataS8Request;
 import com.s8.api.flow.space.requests.AccessSpaceS8Request;
 import com.s8.api.flow.space.requests.CreateSpaceS8Request;
 import com.s8.api.flow.space.requests.ExposeSpaceS8Request;
+import com.s8.api.flow.table.objects.RowS8Object;
+import com.s8.api.flow.table.requests.GetRecordS8Request;
+import com.s8.api.flow.table.requests.PutRecordS8Request;
+import com.s8.api.flow.table.requests.SelectRecordsS8Request;
 import com.s8.core.arch.silicon.SiliconEngine;
 import com.s8.core.web.helium.http2.messages.HTTP2_Message;
 import com.s8.core.web.xenon.XeUser;
@@ -244,7 +244,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 
 	@Override
-	public <T extends RecordS8Object> S8AsyncFlow then(SelectRecordsS8Request<T> request) {
+	public <T extends RowS8Object> S8AsyncFlow then(SelectRecordsS8Request<T> request) {
 		pushOperation(new SelectUsersOp<T>(this, server.userDb,request));
 		return this;
 	}

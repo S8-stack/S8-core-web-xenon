@@ -2,22 +2,22 @@ package com.s8.core.web.xenon.flow;
 
 import java.io.IOException;
 
-import com.s8.api.flow.record.requests.GetRecordS8Request;
-import com.s8.core.arch.magnesium.databases.record.RecordsMgDatabase;
+import com.s8.api.flow.table.requests.GetRecordS8Request;
+import com.s8.core.arch.magnesium.databases.table.TableMgDatabase;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
 
 class GetUserOp extends XeAsyncFlowOperation {
 
 
-	public final RecordsMgDatabase db;
+	public final TableMgDatabase db;
 	
 	public final GetRecordS8Request request;
 
 
 	public GetUserOp(
 			XeAsyncFlow flow, 
-			RecordsMgDatabase db,
+			TableMgDatabase db,
 			GetRecordS8Request request) {
 		super(flow);
 		this.db = db;

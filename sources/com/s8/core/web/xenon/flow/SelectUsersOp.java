@@ -2,9 +2,9 @@ package com.s8.core.web.xenon.flow;
 
 import java.io.IOException;
 
-import com.s8.api.flow.record.objects.RecordS8Object;
-import com.s8.api.flow.record.requests.SelectRecordsS8Request;
-import com.s8.core.arch.magnesium.databases.record.RecordsMgDatabase;
+import com.s8.api.flow.table.objects.RowS8Object;
+import com.s8.api.flow.table.requests.SelectRecordsS8Request;
+import com.s8.core.arch.magnesium.databases.table.TableMgDatabase;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
 
@@ -13,11 +13,11 @@ import com.s8.core.arch.silicon.async.MthProfile;
  * @author pierreconvert
  *
  */
-public class SelectUsersOp<T extends RecordS8Object> extends XeAsyncFlowOperation {
+public class SelectUsersOp<T extends RowS8Object> extends XeAsyncFlowOperation {
 
 	
 	
-	public final RecordsMgDatabase db;
+	public final TableMgDatabase db;
 
 	/**
 	 * 
@@ -33,7 +33,7 @@ public class SelectUsersOp<T extends RecordS8Object> extends XeAsyncFlowOperatio
 	 * @param onFailed
 	 */
 	public SelectUsersOp(XeAsyncFlow flow, 
-			RecordsMgDatabase db,
+			TableMgDatabase db,
 			SelectRecordsS8Request<T> request) {
 		super(flow);
 		this.db = db;

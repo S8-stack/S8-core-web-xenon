@@ -2,22 +2,22 @@ package com.s8.core.web.xenon.flow;
 
 import java.io.IOException;
 
-import com.s8.api.flow.record.requests.PutRecordS8Request;
-import com.s8.core.arch.magnesium.databases.record.RecordsMgDatabase;
+import com.s8.api.flow.table.requests.PutRecordS8Request;
+import com.s8.core.arch.magnesium.databases.table.TableMgDatabase;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
 
 class PutUserOp extends XeAsyncFlowOperation {
 
 
-	public final RecordsMgDatabase db;
+	public final TableMgDatabase db;
 
 	public final PutRecordS8Request request;
 
 
 	public PutUserOp(
 			XeAsyncFlow flow, 
-			RecordsMgDatabase db,
+			TableMgDatabase db,
 			PutRecordS8Request request) {
 		super(flow);
 		this.db = db;
