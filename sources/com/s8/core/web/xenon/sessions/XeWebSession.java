@@ -47,7 +47,7 @@ public class XeWebSession extends HTTP2_Connection {
 	final XeWebServer server;
 
 
-	private NeBranch neBranch;
+	private volatile NeBranch neBranch;
 
 	public final Object lock = new Object();
 
