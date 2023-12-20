@@ -1,24 +1,26 @@
-package com.s8.core.web.xenon.flow;
+package com.s8.core.web.xenon.flow.tables;
 
 import java.io.IOException;
 
-import com.s8.api.flow.table.requests.GetRecordS8Request;
-import com.s8.core.arch.magnesium.databases.table.TableMgDatabase;
+import com.s8.api.flow.table.requests.GetRowS8Request;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
+import com.s8.core.db.tellurium.store.TeDatabaseHandler;
+import com.s8.core.web.xenon.flow.XeAsyncFlow;
+import com.s8.core.web.xenon.flow.XeAsyncFlowOperation;
 
-class GetUserOp extends XeAsyncFlowOperation {
+public class GetRowOp extends XeAsyncFlowOperation {
 
 
-	public final TableMgDatabase db;
+	public final TeDatabaseHandler db;
 	
-	public final GetRecordS8Request request;
+	public final GetRowS8Request request;
 
 
-	public GetUserOp(
+	public GetRowOp(
 			XeAsyncFlow flow, 
-			TableMgDatabase db,
-			GetRecordS8Request request) {
+			TeDatabaseHandler db,
+			GetRowS8Request request) {
 		super(flow);
 		this.db = db;
 		this.request = request;
@@ -34,7 +36,7 @@ class GetUserOp extends XeAsyncFlowOperation {
 			@Override
 			public void run() {
 				if(db != null) {
-					db.get(0L, () -> flow.roll(true), request);	
+					db.getRow(0L, null, () -> flow.roll(true), request);	
 				}
 				else {
 					/* issue erreor directly */

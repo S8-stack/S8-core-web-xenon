@@ -1,28 +1,30 @@
-package com.s8.core.web.xenon.flow;
+package com.s8.core.web.xenon.flow.tables;
 
 import java.io.IOException;
 
 import com.s8.api.flow.table.objects.RowS8Object;
-import com.s8.api.flow.table.requests.SelectRecordsS8Request;
-import com.s8.core.arch.magnesium.databases.table.TableMgDatabase;
+import com.s8.api.flow.table.requests.SelectRowsS8Request;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
+import com.s8.core.db.tellurium.store.TeDatabaseHandler;
+import com.s8.core.web.xenon.flow.XeAsyncFlow;
+import com.s8.core.web.xenon.flow.XeAsyncFlowOperation;
 
 /**
  * 
  * @author pierreconvert
  *
  */
-public class SelectUsersOp<T extends RowS8Object> extends XeAsyncFlowOperation {
+public class SelectRowsOp<T extends RowS8Object> extends XeAsyncFlowOperation {
 
 	
 	
-	public final TableMgDatabase db;
+	public final TeDatabaseHandler db;
 
 	/**
 	 * 
 	 */
-	public final SelectRecordsS8Request<T> request;
+	public final SelectRowsS8Request<T> request;
 
 	/**
 	 * 
@@ -32,9 +34,9 @@ public class SelectUsersOp<T extends RowS8Object> extends XeAsyncFlowOperation {
 	 * @param onSelected
 	 * @param onFailed
 	 */
-	public SelectUsersOp(XeAsyncFlow flow, 
-			TableMgDatabase db,
-			SelectRecordsS8Request<T> request) {
+	public SelectRowsOp(XeAsyncFlow flow, 
+			TeDatabaseHandler db,
+			SelectRowsS8Request<T> request) {
 		super(flow);
 		this.db = db;
 		this.request = request;
@@ -52,11 +54,11 @@ public class SelectUsersOp<T extends RowS8Object> extends XeAsyncFlowOperation {
 			@Override
 			public void run() {
 				if(db != null) {
-					db.select(0L, () -> flow.roll(true), request);	
+					db.selectRows(0L, null, () -> flow.roll(true), request);	
 				}
 				else {
 					/* request */
-					request.onError(new IOException("User DB missing in this context"));
+					request.onFailed(new IOException("User DB missing in this context"));
 					
 					/* continue */
 					flow.roll(true);

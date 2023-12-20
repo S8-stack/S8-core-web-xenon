@@ -24,20 +24,26 @@ module com.s8.core.web.xenon {
 	
 	requires transitive com.s8.core.io.bytes;
 	requires transitive com.s8.core.io.xml;
+	
 	requires transitive com.s8.core.arch.silicon;
+	requires transitive com.s8.core.arch.magnesium;
+	
 	
 	requires transitive com.s8.core.web.helium;
 	requires transitive com.s8.core.web.carbon;
 	requires transitive com.s8.core.web.manganese;
 	
-
+	
 	requires transitive com.s8.core.bohr.atom;
 	requires transitive com.s8.core.bohr.neon;
 	requires transitive com.s8.core.bohr.beryllium;
 	requires transitive com.s8.core.bohr.lithium;
 	requires transitive com.s8.core.bohr.neodymium;
 	
-	requires transitive com.s8.core.arch.magnesium;
+	
+	requires transitive com.s8.core.db.tellurium;
+	requires transitive com.s8.core.db.cobalt;
+	requires transitive com.s8.core.db.copper;
 	
 	
 }

@@ -1,23 +1,39 @@
-package com.s8.core.web.xenon.flow;
+package com.s8.core.web.xenon.flow.repos;
 
 import java.io.IOException;
 
-import com.s8.api.flow.repository.requests.CommitBranchS8Request;
-import com.s8.core.arch.magnesium.databases.repository.store.RepoMgDatabase;
+import com.s8.api.flow.repository.requests.ForkRepositoryS8Request;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
+import com.s8.core.db.copper.store.RepoMgDatabase;
+import com.s8.core.web.xenon.flow.XeAsyncFlow;
+import com.s8.core.web.xenon.flow.XeAsyncFlowOperation;
 
-public class CommitBranchOp extends XeAsyncFlowOperation {
 
+/**
+ * 
+ * @author pierreconvert
+ *
+ */
+public class ForkRepoOp extends XeAsyncFlowOperation {
+
+	
+	/**
+	 * 
+	 */
 	public final RepoMgDatabase db;
 	
-	public final CommitBranchS8Request request;
+	
+	/**
+	 * 
+	 */
+	public final ForkRepositoryS8Request request;
 
 
 
-	public CommitBranchOp(XeAsyncFlow flow, 
+	public ForkRepoOp(XeAsyncFlow flow, 
 			RepoMgDatabase db,
-			CommitBranchS8Request request) {
+			ForkRepositoryS8Request request) {
 		super(flow);
 		this.db = db;
 		this.request = request;
@@ -37,17 +53,16 @@ public class CommitBranchOp extends XeAsyncFlowOperation {
 
 					/* create output */
 					request.onFailed(new IOException("Repo DB is unavailable in this context"));
-
+					
 					/* continue immediately */
 					flow.roll(true);					
 
 				}
 				else {
-					db.commitBranch(0L, flow.session.user, 
+					db.forkRepository(0L, flow.session.user, 
 							() -> flow.roll(true), /* callback: continue after request has been performed */
-							request);
+							request);	
 				}
-				
 			}
 			
 			@Override

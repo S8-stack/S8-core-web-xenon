@@ -2,13 +2,14 @@ package com.s8.core.web.xenon;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
-import java.nio.file.Path;
 
-import com.s8.core.arch.magnesium.databases.repository.store.RepoMgDatabase;
-import com.s8.core.arch.magnesium.databases.space.store.SpaceMgDatabase;
-import com.s8.core.arch.magnesium.databases.table.TableMgDatabase;
-import com.s8.core.arch.magnesium.service.MgConfiguration;
 import com.s8.core.arch.silicon.SiliconEngine;
+import com.s8.core.db.cobalt.CoConfiguration;
+import com.s8.core.db.cobalt.store.SpaceMgDatabase;
+import com.s8.core.db.copper.CuConfiguration;
+import com.s8.core.db.copper.store.RepoMgDatabase;
+import com.s8.core.db.tellurium.TeConfiguration;
+import com.s8.core.db.tellurium.store.TeDatabaseHandler;
 import com.s8.core.io.xml.codebase.XML_Codebase;
 import com.s8.core.web.carbon.web.CarbonWebService;
 import com.s8.core.web.helium.http1.HTTP1_Server;
@@ -65,11 +66,11 @@ public class XeWebServer extends HTTP2_Server {
 	public final ManganeseWebService manganeseWebService;
 	
 	
-	public final TableMgDatabase userDb;
+	public final TeDatabaseHandler tablesDb;
 	
-	public final SpaceMgDatabase spaceDb;
+	public final SpaceMgDatabase spacesDb;
 	
-	public final RepoMgDatabase repoDb;
+	public final RepoMgDatabase reposDb;
 	
 	
 
@@ -124,54 +125,19 @@ public class XeWebServer extends HTTP2_Server {
 				new ManganeseWebService(configuration.manganese) : null;	
 		
 		
-		/* create user database */
-		MgConfiguration magnesium = configuration.magnesium;
+		/* create tables database */
+		TeConfiguration tellurium = configuration.tablesDb;
+		tablesDb = tellurium != null ? tellurium.create(siliconEngine, codebase.tableClasses) : null;
 		
-		if(magnesium != null) {
-			if(magnesium.userDbConfigPathname != null) {
-				userDb = new TableMgDatabase(siliconEngine, 
-						codebase.userCodebase, 
-						Path.of(magnesium.userDbConfigPathname));	
-			}
-			else {
-				userDb = null;
-			}
-			
-			
-			
-			
-			/* create space database */
-			if(magnesium.spaceDbConfigPathname != null) {
-				spaceDb = new SpaceMgDatabase(siliconEngine, 
-						codebase.spaceCodebase, 
-						Path.of(magnesium.spaceDbConfigPathname));
-			}
-			else {
-				spaceDb = null;
-			}
-			
-			
-			
-			
-			/* repository database */
-			if(magnesium.repoDbConfigPathname != null) {
-				repoDb = new RepoMgDatabase(siliconEngine, 
-						codebase.repoCodebase, 
-						Path.of(magnesium.repoDbConfigPathname));
-			}
-			else {
-				repoDb = null;
-			}
-			
-		}
-		else {
-			userDb = null;
-			spaceDb = null;
-			repoDb = null;
-		}
+		/* create spaces database */
+		CoConfiguration cobalt = configuration.cobalt;
+		spacesDb = cobalt != null ? cobalt.create(siliconEngine, codebase.spaceClasses) : null;
 		
+		/* create repositories database */
+		CuConfiguration copper = configuration.copper;
+		reposDb = copper != null ? copper.create(siliconEngine, codebase.repoClasses) : null;
 		
-		
+			
 
 
 		if(isRedirecting = (configuration.http1_redirection!=null)) {

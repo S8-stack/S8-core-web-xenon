@@ -8,6 +8,9 @@ import java.io.InputStream;
 
 import com.s8.core.arch.magnesium.service.MgConfiguration;
 import com.s8.core.arch.silicon.SiliconConfiguration;
+import com.s8.core.db.cobalt.CoConfiguration;
+import com.s8.core.db.copper.CuConfiguration;
+import com.s8.core.db.tellurium.TeConfiguration;
 import com.s8.core.io.xml.annotations.XML_SetElement;
 import com.s8.core.io.xml.annotations.XML_Type;
 import com.s8.core.io.xml.codebase.XML_Codebase;
@@ -62,7 +65,32 @@ public class XeConfiguration {
 	public void setMagnesiumService(MgConfiguration config) {
 		this.magnesium = config;
 	}
+	
+	public TeConfiguration tablesDb;
 
+	@XML_SetElement(tag = "tables-db")
+	public void setTelluriumDbConfig(TeConfiguration config) {
+		this.tablesDb = config;
+	}
+	
+	
+	public CoConfiguration cobalt;
+
+	@XML_SetElement(tag = "spaces-db")
+	public void setCobaltDbConfig(CoConfiguration config) {
+		this.cobalt = config;
+	}
+	
+	
+	public CuConfiguration copper;
+
+	@XML_SetElement(tag = "repos-db")
+	public void setCopperDbConfig(CuConfiguration config) {
+		this.copper = config;
+	}
+	
+	
+	
 
 	public String http1_redirection;
 

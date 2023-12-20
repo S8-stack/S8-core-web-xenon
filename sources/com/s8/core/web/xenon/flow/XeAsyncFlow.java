@@ -16,15 +16,28 @@ import com.s8.api.flow.space.requests.AccessSpaceS8Request;
 import com.s8.api.flow.space.requests.CreateSpaceS8Request;
 import com.s8.api.flow.space.requests.ExposeSpaceS8Request;
 import com.s8.api.flow.table.objects.RowS8Object;
-import com.s8.api.flow.table.requests.GetRecordS8Request;
-import com.s8.api.flow.table.requests.PutRecordS8Request;
-import com.s8.api.flow.table.requests.SelectRecordsS8Request;
+import com.s8.api.flow.table.requests.CreateTableS8Request;
+import com.s8.api.flow.table.requests.GetRowS8Request;
+import com.s8.api.flow.table.requests.PutRowS8Request;
+import com.s8.api.flow.table.requests.SelectRowsS8Request;
 import com.s8.core.arch.silicon.SiliconEngine;
 import com.s8.core.web.helium.http2.messages.HTTP2_Message;
 import com.s8.core.web.xenon.XeUser;
 import com.s8.core.web.xenon.XeWebServer;
 import com.s8.core.web.xenon.flow.delivery.XeDeliveryTask;
 import com.s8.core.web.xenon.flow.mail.SendMailOp;
+import com.s8.core.web.xenon.flow.repos.CloneBranchOp;
+import com.s8.core.web.xenon.flow.repos.CommitBranchOp;
+import com.s8.core.web.xenon.flow.repos.CreateRepoOp;
+import com.s8.core.web.xenon.flow.repos.ForkBranchOp;
+import com.s8.core.web.xenon.flow.repos.ForkRepoOp;
+import com.s8.core.web.xenon.flow.repos.GetRepoMetadataOp;
+import com.s8.core.web.xenon.flow.spaces.AccessSpaceOp;
+import com.s8.core.web.xenon.flow.spaces.ExposeSpaceOp;
+import com.s8.core.web.xenon.flow.tables.CreateTableOp;
+import com.s8.core.web.xenon.flow.tables.GetRowOp;
+import com.s8.core.web.xenon.flow.tables.PutRowOp;
+import com.s8.core.web.xenon.flow.tables.SelectRowsOp;
 import com.s8.core.web.xenon.sessions.XeWebSession;
 import com.s8.io.bohr.neon.core.NeBranch;
 
@@ -230,22 +243,31 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	}
 
 
+
+
+
 	@Override
-	public S8AsyncFlow then(GetRecordS8Request request) {
-		pushOperation(new GetUserOp(this, server.userDb, request));	
+	public S8AsyncFlow createTable(CreateTableS8Request request) {
+		pushOperation(new CreateTableOp(this, server.tablesDb, request));	
+		return this;
+	}
+	
+	@Override
+	public S8AsyncFlow then(GetRowS8Request request) {
+		pushOperation(new GetRowOp(this, server.tablesDb, request));	
 		return this;
 	}
 
 	@Override
-	public S8AsyncFlow then(PutRecordS8Request request) {
-		pushOperation(new PutUserOp(this, server.userDb, request));
+	public S8AsyncFlow then(PutRowS8Request request) {
+		pushOperation(new PutRowOp(this, server.tablesDb, request));
 		return this;
 	}
 
 
 	@Override
-	public <T extends RowS8Object> S8AsyncFlow then(SelectRecordsS8Request<T> request) {
-		pushOperation(new SelectUsersOp<T>(this, server.userDb,request));
+	public <T extends RowS8Object> S8AsyncFlow then(SelectRowsS8Request<T> request) {
+		pushOperation(new SelectRowsOp<T>(this, server.tablesDb,request));
 		return this;
 	}
 
@@ -256,14 +278,14 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow then(AccessSpaceS8Request request) {
-		pushOperation(new AccessSpaceOp(this, server.spaceDb, request));
+		pushOperation(new AccessSpaceOp(this, server.spacesDb, request));
 		return this;
 	}
 
 
 	@Override
 	public S8AsyncFlow then(ExposeSpaceS8Request request) {
-		pushOperation(new ExposeSpaceOp(this, server.spaceDb, request));
+		pushOperation(new ExposeSpaceOp(this, server.spacesDb, request));
 		return this;
 	}
 
@@ -273,7 +295,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow then(CreateRepositoryS8Request request) {
-		pushOperation(new CreateRepoOp(this, server.repoDb, request));
+		pushOperation(new CreateRepoOp(this, server.reposDb, request));
 		return this;
 	}
 
@@ -284,7 +306,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow then(GetRepositoryMetadataS8Request request) {
-		pushOperation(new GetRepoMetadataOp(this, server.repoDb, request));
+		pushOperation(new GetRepoMetadataOp(this, server.reposDb, request));
 		return this;
 	}
 
@@ -292,7 +314,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow then(ForkBranchS8Request request) {
-		pushOperation(new ForkBranchOp(this, server.repoDb, request));
+		pushOperation(new ForkBranchOp(this, server.reposDb, request));
 		return this;
 	}
 
@@ -300,7 +322,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow then(ForkRepositoryS8Request request) {
-		pushOperation(new ForkRepoOp(this, server.repoDb, request));
+		pushOperation(new ForkRepoOp(this, server.reposDb, request));
 		return this;
 	}
 
@@ -310,7 +332,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow then(CommitBranchS8Request request) {
-		pushOperation(new CommitBranchOp(this, server.repoDb, request));
+		pushOperation(new CommitBranchOp(this, server.reposDb, request));
 		return this;
 	}
 
@@ -318,7 +340,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public S8AsyncFlow then(CloneBranchS8Request request) {
-		pushOperation(new CloneBranchOp(this, server.repoDb, request));
+		pushOperation(new CloneBranchOp(this, server.reposDb, request));
 		return this;
 	}
 
@@ -361,6 +383,13 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public S8AsyncFlow then(GetBranchMetadataS8Request request) {
 		throw new RuntimeException("Not implemented yet");
 	}
+
+
+
+
+
+
+
 
 
 }
