@@ -1,13 +1,13 @@
 
 
 
-import { ByteOutflow } from '/s8-core-io-bytes/ByteOutflow.js';
-import { ByteInflow } from '/s8-core-io-bytes/ByteInflow.js';
+import { ByteOutflow } from '/S8-core-io-bytes/ByteOutflow.js';
+import { ByteInflow } from '/S8-core-io-bytes/ByteInflow.js';
 
-import { S8 } from '/s8-core-io-bohr-atom/S8.js';
-import { NeBranch } from '/s8-core-io-bohr-neon/NeBranch.js';
+import { S8 } from '/S8-core-bohr-atom/S8.js';
+import { NeBranch } from '/S8-core-bohr-neon/NeBranch.js';
 
-import { XENON_Keywords } from '/s8-core-web-xenon/XeProtocol.js';
+import { XENON_Keywords } from '/S8-core-web-xenon/XeProtocol.js';
 
 
 
