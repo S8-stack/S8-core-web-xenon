@@ -1,19 +1,30 @@
 
 
 
+import { S8 } from '/S8-api/S8Context.js';
+
 import { ByteOutflow } from '/S8-core-io-bytes/ByteOutflow.js';
 import { ByteInflow } from '/S8-core-io-bytes/ByteInflow.js';
 
-import { S8 } from '/S8-core-bohr-atom/S8.js';
 import { NeBranch } from '/S8-core-bohr-neon/NeBranch.js';
 
 import { XENON_Keywords } from '/S8-core-web-xenon/XeProtocol.js';
 
 
+import { XeWebServer } from './XeWebServer.js';
+import { XeWebPage } from './XeWebPage.js';
 
 
 export const launch = function(){
+
+    /* define S8 context */
+    S8.server = new XeWebServer();
+    S8.page = new XeWebPage();
+
+    /* create launcher */
     const launcher = new XeLauncher();
+
+    /* launch! */
     launcher.start();
 }
 
@@ -37,7 +48,7 @@ class XeLauncher {
         outflow.putUInt8(XENON_Keywords.BOOT);
 
         const _this = this;
-        S8.sendRequest_HTTP2_POST(requestArrayBuffer, function (responseArrayBuffer) {
+        S8.server.sendRequest_HTTP2_POST(requestArrayBuffer, function (responseArrayBuffer) {
 
             /* clear screen */
             _this.clearScreen();
