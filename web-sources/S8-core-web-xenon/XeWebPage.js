@@ -1,3 +1,4 @@
+import { S8 } from "/S8-api/S8Context.js";
 import { S8WebPage } from "/S8-api/S8WebPage.js";
 
 
@@ -78,9 +79,9 @@ export class XeWebPage extends S8WebPage {
 	 * @param {number} width 
 	 * @param {number} height 
 	 */
-	SVG_insertByName(target, name, width, height) {
+	SVG_insertByPathname(target, pathname, width, height) {
 
-		let svgSource0 = this.map_SVG_sources.get(name);
+		let svgSource0 = this.map_SVG_sources.get(pathname);
 
 		let injector = function (source) {
 			target.innerHTML = source;
@@ -94,9 +95,8 @@ export class XeWebPage extends S8WebPage {
 		}
 		else {
 			let _this = this;
-			const pathname = ICON_ROOT_PATHNAME + name;
-			S8.sendRequest_HTTP2_GET(pathname, "text", function (svgSource1) {
-				_this.map_SVG_sources.set(name, svgSource1);
+			S8.server.sendRequest_HTTP2_GET(pathname, "text", function (svgSource1) {
+				_this.map_SVG_sources.set(pathname, svgSource1);
 				injector(svgSource1);
 			});
 		}
