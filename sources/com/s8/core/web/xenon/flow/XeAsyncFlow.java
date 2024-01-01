@@ -238,7 +238,13 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public void sendEMail(SendMailS8Request request) {
-		pushOperation(new SendMailOp(this, server.manganeseWebService, request));
+		if(!request.isOutOfFlow) {
+			pushOperation(new SendMailOp(this, server.manganeseWebService, request));	
+		}
+		else {
+			ng.pushAsyncTask(SendMailOp.createOutOfSyncTask(server.manganeseWebService, request));
+		}
+		
 	}
 
 

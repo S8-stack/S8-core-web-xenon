@@ -11,6 +11,38 @@ import com.s8.core.web.xenon.flow.XeAsyncFlowOperation;
 
 public class SendMailOp extends XeAsyncFlowOperation {
 
+	
+	public static AsyncSiTask createOutOfSyncTask(
+			ManganeseWebService service, 
+			SendMailS8Request request) {
+		
+		return new AsyncSiTask() {
+
+			@Override
+			public void run() {
+
+				if(service != null) {
+					service.sendMail(request);
+				}
+				else {
+					/* issue error directly */
+					request.onFailed(new IOException("mail service is undefined in this context"));
+				}
+			}
+
+			@Override
+			public MthProfile profile() { 
+				return MthProfile.IO_DATA_LAKE; 
+			}
+
+
+			@Override
+			public String describe() { 
+				return "Committing"; 
+			}
+		};
+	}
+	
 
 	public final ManganeseWebService service;
 
