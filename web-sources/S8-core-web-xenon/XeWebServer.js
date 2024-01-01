@@ -79,10 +79,10 @@ export class XeWebServer extends S8WebServer {
 
     /**
      * 
-     * @param {*} requestArrayBuffer 
-     * @param {*} responseCallback 
+     * @param {Uint8Array} requestArray 
+     * @param {Function} responseCallback 
      */
-    sendRequest_HTTP2_POST(requestArrayBuffer, responseCallback) {
+    sendRequest_HTTP2_POST(requestArray, responseCallback) {
 
         // create request
         let request = new XMLHttpRequest();
@@ -111,7 +111,7 @@ export class XeWebServer extends S8WebServer {
         };
 
         // fire
-        request.send(new Uint8Array(requestArrayBuffer));
+        request.send(requestArray);
 
 
         /*

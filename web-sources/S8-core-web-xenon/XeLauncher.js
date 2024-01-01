@@ -48,7 +48,7 @@ class XeLauncher {
         outflow.putUInt8(XENON_Keywords.BOOT);
 
         const _this = this;
-        S8.server.sendRequest_HTTP2_POST(requestArrayBuffer, function (responseArrayBuffer) {
+        S8.server.sendRequest_HTTP2_POST(new Uint8Array(requestArrayBuffer), function (responseArrayBuffer) {
 
             /* clear screen */
             _this.clearScreen();
