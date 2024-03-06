@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.s8.api.flow.repository.requests.ForkBranchS8Request;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
-import com.s8.core.db.copper.store.RepoMgDatabase;
+import com.s8.core.db.copper.store.CuRepoDB;
 import com.s8.core.web.xenon.flow.XeAsyncFlow;
 import com.s8.core.web.xenon.flow.XeAsyncFlowOperation;
 
@@ -18,7 +18,7 @@ import com.s8.core.web.xenon.flow.XeAsyncFlowOperation;
 public class ForkBranchOp extends XeAsyncFlowOperation {
 
 
-	public final RepoMgDatabase db;
+	public final CuRepoDB db;
 
 	/**
 	 * 
@@ -28,7 +28,7 @@ public class ForkBranchOp extends XeAsyncFlowOperation {
 
 
 	public ForkBranchOp(XeAsyncFlow flow, 
-			RepoMgDatabase db,
+			CuRepoDB db,
 			ForkBranchS8Request request) {
 		super(flow);
 		this.db = db;

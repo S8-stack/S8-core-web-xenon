@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.s8.api.flow.repository.requests.CloneBranchS8Request;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
-import com.s8.core.db.copper.store.RepoMgDatabase;
+import com.s8.core.db.copper.store.CuRepoDB;
 import com.s8.core.web.xenon.flow.XeAsyncFlow;
 import com.s8.core.web.xenon.flow.XeAsyncFlowOperation;
 
@@ -18,7 +18,7 @@ import com.s8.core.web.xenon.flow.XeAsyncFlowOperation;
 public class CloneBranchOp extends XeAsyncFlowOperation {
 
 
-	public final RepoMgDatabase db;
+	public final CuRepoDB db;
 	
 	public final CloneBranchS8Request request;
 	
@@ -34,7 +34,7 @@ public class CloneBranchOp extends XeAsyncFlowOperation {
 	 * @param onException
 	 */
 	public CloneBranchOp(XeAsyncFlow flow, 
-			RepoMgDatabase db,
+			CuRepoDB db,
 			CloneBranchS8Request request) {
 		
 		super(flow);

@@ -6,8 +6,8 @@ import java.nio.channels.SocketChannel;
 import com.s8.core.arch.silicon.SiliconEngine;
 import com.s8.core.db.cobalt.CoConfiguration;
 import com.s8.core.db.cobalt.store.SpaceMgDatabase;
-import com.s8.core.db.copper.CuConfiguration;
-import com.s8.core.db.copper.store.RepoMgDatabase;
+import com.s8.core.db.copper.CuRepoDBConfiguration;
+import com.s8.core.db.copper.store.CuRepoDB;
 import com.s8.core.db.tellurium.TeConfiguration;
 import com.s8.core.db.tellurium.store.TeDatabaseHandler;
 import com.s8.core.io.xml.codebase.XML_Codebase;
@@ -70,7 +70,7 @@ public class XeWebServer extends HTTP2_Server {
 	
 	public final SpaceMgDatabase spacesDb;
 	
-	public final RepoMgDatabase reposDb;
+	public final CuRepoDB reposDb;
 	
 	
 
@@ -134,7 +134,7 @@ public class XeWebServer extends HTTP2_Server {
 		spacesDb = cobalt != null ? cobalt.create(siliconEngine, codebase.spaceClasses) : null;
 		
 		/* create repositories database */
-		CuConfiguration copper = configuration.copper;
+		CuRepoDBConfiguration copper = configuration.copper;
 		reposDb = copper != null ? copper.create(siliconEngine, codebase.repoClasses) : null;
 		
 			

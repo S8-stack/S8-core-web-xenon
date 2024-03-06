@@ -9,7 +9,7 @@ import java.io.InputStream;
 import com.s8.core.arch.magnesium.service.MgConfiguration;
 import com.s8.core.arch.silicon.SiliconConfiguration;
 import com.s8.core.db.cobalt.CoConfiguration;
-import com.s8.core.db.copper.CuConfiguration;
+import com.s8.core.db.copper.CuRepoDBConfiguration;
 import com.s8.core.db.tellurium.TeConfiguration;
 import com.s8.core.io.xml.annotations.XML_SetElement;
 import com.s8.core.io.xml.annotations.XML_Type;
@@ -82,10 +82,10 @@ public class XeConfiguration {
 	}
 	
 	
-	public CuConfiguration copper;
+	public CuRepoDBConfiguration copper;
 
 	@XML_SetElement(tag = "repos-db")
-	public void setCopperDbConfig(CuConfiguration config) {
+	public void setCopperDbConfig(CuRepoDBConfiguration config) {
 		this.copper = config;
 	}
 	
