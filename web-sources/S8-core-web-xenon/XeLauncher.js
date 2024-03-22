@@ -11,15 +11,15 @@ import { NeBranch } from '/S8-core-bohr-neon/NeBranch.js';
 import { XENON_Keywords } from '/S8-core-web-xenon/XeProtocol.js';
 
 
-import { XeWebServer } from './XeWebServer.js';
-import { XeWebPage } from './XeWebPage.js';
+import { XeServer } from './XeServer.js';
+import { XePage } from './XePage.js';
 
 
 export const launch = function(){
 
     /* define S8 context */
-    S8.server = new XeWebServer();
-    S8.page = new XeWebPage();
+    S8.server = new XeServer();
+    S8.page = new XePage();
 
     /* create launcher */
     const launcher = new XeLauncher();

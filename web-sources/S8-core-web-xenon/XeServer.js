@@ -1,9 +1,9 @@
-import { S8WebServer } from "/S8-api/S8WebServer.js";
+import { S8Server } from "/S8-api/S8Server.js";
 
 /**
  * 
  */
-export class XeWebServer extends S8WebServer {
+export class XeServer extends S8Server {
 
 
     /**

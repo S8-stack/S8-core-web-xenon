@@ -1,10 +1,10 @@
 import { S8 } from "/S8-api/S8Context.js";
-import { S8WebPage } from "/S8-api/S8WebPage.js";
+import { S8Page } from "/S8-api/S8Page.js";
 
 
 
 
-export class XeWebPage extends S8WebPage {
+export class XePage extends S8Page {
 
 
 
