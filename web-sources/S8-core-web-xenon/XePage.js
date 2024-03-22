@@ -35,6 +35,13 @@ export class XePage extends S8Page {
 	baseLayerNode;
 
 
+	/**
+	 * @type{HTMLDivElement}
+	 * Node for rendering of all popovers (one root node at a time)
+	 */
+	popoverLayerNode;
+
+
 	constructor() {
 		super();
 
@@ -44,10 +51,22 @@ export class XePage extends S8Page {
 			document.body.removeChild(document.body.firstChild);
 		}
 
+		this.CSS_import("/S8-core-web-xenon/XePage.css");
 
 		/* prepare base layer */
 		this.baseLayerNode = document.createElement("div");
+		this.baseLayerNode.className = "xenon-page-layer-base";
 		document.body.appendChild(this.baseLayerNode);
+
+		/* prepare popover layer */
+		this.popoverLayerNode = document.createElement("div");
+		this.popoverLayerNode.className = "xenon-page-layer-popover";
+		document.body.appendChild(this.popoverLayerNode);
+
+		/*
+		const _this = this;
+		document.body.addEventListener("scroll", function(){ _this.HTML_clearPopover(); }, false);
+		*/
 	}
 
 
@@ -153,6 +172,20 @@ export class XePage extends S8Page {
 			this.baseLayerNode.removeChild(this.baseLayerNode.lastChild);
 		}
 		this.baseLayerNode.appendChild(node);
+	}
+
+	/**
+	 * @param {HTMLElement} node 
+	 */
+	HTML_setPopover(node) {
+		this.HTML_clearPopover();
+		this.popoverLayerNode.appendChild(node);
+	}
+
+	HTML_clearPopover() {
+		while(this.popoverLayerNode.firstChild) {
+			this.popoverLayerNode.removeChild(this.popoverLayerNode.lastChild);
+		}
 	}
 
 
