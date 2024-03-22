@@ -27,12 +27,27 @@ export class XePage extends S8Page {
 	 * Previously active object: the last which sends a signal
 	 */
 	focus = null;
-	
 
+	/**
+	 * @type{HTMLDivElement}
+	 * Node for rendering of all base displayed elements
+	 */
+	baseLayerNode;
 
 
 	constructor() {
-        super();
+		super();
+
+
+		/* clear screen */
+		while (document.body.firstChild != undefined) {
+			document.body.removeChild(document.body.firstChild);
+		}
+
+
+		/* prepare base layer */
+		this.baseLayerNode = document.createElement("div");
+		document.body.appendChild(this.baseLayerNode);
 	}
 
 
@@ -124,21 +139,24 @@ export class XePage extends S8Page {
 
 
 
-	setRoot(node) {
+	/**
+	 * @override {HTML_setRootElement}
+	 * @param {HTMLElement} node 
+	 */
+	HTML_setRootElement(node) {
 		/* An earlier edit to this answer used firstChild, 
 		but this is updated to use lastChild as in computer-science, 
 		in general, it's significantly faster to remove the last 
 		element of a collection than it is to remove the first element 
 		(depending on how the collection is implemented). */
-		while (this.screenNode.firstChild) {
-			this.screenNode.removeChild(this.screenNode.lastChild);
+		while (this.baseLayerNode.firstChild) {
+			this.baseLayerNode.removeChild(this.baseLayerNode.lastChild);
 		}
-
-		this.screenNode.appendChild(node);
+		this.baseLayerNode.appendChild(node);
 	}
 
 
-    /**
+	/**
 	 * 
 	 * @param {Object} object 
 	 */
@@ -152,12 +170,12 @@ export class XePage extends S8Page {
 		/* replace focus */
 		this.focus = object;
 	}
-    
+
 
 	/**
 	 * 
 	 */
-	loseFocus(){
+	loseFocus() {
 		/* unfocus */
 		if (this.focus != null) {
 			if (this.focus.S8_unfocus) { this.focus.S8_unfocus(); }
@@ -167,6 +185,4 @@ export class XePage extends S8Page {
 		/* replace focus */
 		this.focus = null;
 	}
-
-
 }

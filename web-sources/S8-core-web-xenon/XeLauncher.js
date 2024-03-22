@@ -50,15 +50,11 @@ class XeLauncher {
         const _this = this;
         S8.server.sendRequest_HTTP2_POST(new Uint8Array(requestArrayBuffer), function (responseArrayBuffer) {
 
-            /* clear screen */
-            _this.clearScreen();
+          
 
-            /* prepare screen node */
-            const screenNode = document.createElement("div");
-            document.body.appendChild(screenNode);
 
             /* Equip S8 with a NEON Branch, holding screen node */
-            S8.branch = new NeBranch(screenNode, XENON_Keywords.RUN_FUNC);
+            S8.branch = new NeBranch(XENON_Keywords.RUN_FUNC);
 
             /* run branch */
             let inflow = new ByteInflow(responseArrayBuffer);
@@ -68,12 +64,6 @@ class XeLauncher {
         });
     }
 
-
-    clearScreen() {
-        while (document.body.firstChild != undefined) {
-            document.body.removeChild(document.body.firstChild);
-        }
-    }
 }
 
 
