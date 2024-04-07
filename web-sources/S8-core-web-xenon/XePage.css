@@ -1,13 +1,8 @@
 
 
 
-.xenon-page-layer-base, .xenon-page-layer-popover {
-    margin: 0px;
-    padding: 0px;
-}
 
-
-.xenon-page-layer-base{
+#xenon-page-layer-base{
     position: absolute;
     top: 0px;
     bottom: 0px;
@@ -15,14 +10,18 @@
     z-index: 2;
     width: 100%;
     height: 100%;
+    margin: 0px;
+    padding: 0px;
 }
 
 
 
-.xenon-page-layer-popover {
+#xenon-page-layer-popover {
     /* NO ABSOLUTE POSITION ! */
     position:fixed;
     z-index: 8;
     width: 0px;
-    height: 0px;
+    height: 0px; 
+    margin: 0px;
+    padding: 0px;
 }

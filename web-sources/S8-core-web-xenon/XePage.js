@@ -55,12 +55,12 @@ export class XePage extends S8Page {
 
 		/* prepare base layer */
 		this.baseLayerNode = document.createElement("div");
-		this.baseLayerNode.className = "xenon-page-layer-base";
+		this.baseLayerNode.id = "xenon-page-layer-base";
 		document.body.appendChild(this.baseLayerNode);
 
 		/* prepare popover layer */
 		this.popoverLayerNode = document.createElement("div");
-		this.popoverLayerNode.className = "xenon-page-layer-popover";
+		this.popoverLayerNode.id = "xenon-page-layer-popover";
 		document.body.appendChild(this.popoverLayerNode);
 
 		/*
