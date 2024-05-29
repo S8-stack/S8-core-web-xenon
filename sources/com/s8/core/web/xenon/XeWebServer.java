@@ -20,7 +20,7 @@ import com.s8.core.web.helium.rx.RxConnection;
 import com.s8.core.web.manganese.ManganeseWebService;
 import com.s8.core.web.xenon.config.XeConfiguration;
 import com.s8.core.web.xenon.config.XeMode;
-import com.s8.core.web.xenon.sessions.XeWebSession;
+import com.s8.core.web.xenon.sessions.XeWebConnection;
 
 
 
@@ -154,7 +154,7 @@ public class XeWebServer extends HTTP2_Server {
 
 	@Override
 	public RxConnection open(SocketChannel socketChannel) throws IOException {
-		return new XeWebSession(socketChannel, this);
+		return new XeWebConnection(socketChannel, this);
 	}
 
 

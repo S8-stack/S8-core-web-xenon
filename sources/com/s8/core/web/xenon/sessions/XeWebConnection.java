@@ -2,6 +2,7 @@ package com.s8.core.web.xenon.sessions;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.s8.api.bytes.ByteInflow;
 import com.s8.core.arch.silicon.SiliconEngine;
@@ -36,7 +37,7 @@ import com.s8.io.bohr.neon.core.NeBranch;
  * @author pc
  *
  */
-public class XeWebSession extends HTTP2_Connection {
+public class XeWebConnection extends HTTP2_Connection {
 
 	/* <methods> */
 
@@ -49,7 +50,9 @@ public class XeWebSession extends HTTP2_Connection {
 
 	private volatile NeBranch neBranch;
 
-	public final Object lock = new Object();
+	//public final Object lock = new Object();
+
+	public final AtomicBoolean isBusy = new AtomicBoolean(false);
 
 
 	public volatile XeUser user;
@@ -62,7 +65,7 @@ public class XeWebSession extends HTTP2_Connection {
 	 */
 	// private WebSession session;
 
-	public XeWebSession(SocketChannel socketChannel, XeWebServer server) throws IOException {
+	public XeWebConnection(SocketChannel socketChannel, XeWebServer server) throws IOException {
 		super(socketChannel, server.getWebConfiguration());
 
 		this.ng = server.siliconEngine;
@@ -177,7 +180,7 @@ public class XeWebSession extends HTTP2_Connection {
 				// build new branch
 				neBranch = new NeBranch("w");
 
-				XeAsyncFlow flow = new XeAsyncFlow(ng, server, XeWebSession.this, neBranch, response);
+				XeAsyncFlow flow = new XeAsyncFlow(ng, server, XeWebConnection.this, neBranch, response);
 
 				try {
 					// boot...
@@ -200,38 +203,49 @@ public class XeWebSession extends HTTP2_Connection {
 	 * @param response
 	 */
 	private void serveFunc(ByteInflow inflow, HTTP2_Message response) {
+		if(isBusy.compareAndSet(false, true)) {
 
-		ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
+			ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
 
-			public @Override String describe() {
-				return "Normal server processing";
-			}
-
-			public @Override MthProfile profile() {
-				return MthProfile.FX2;
-			}
-
-			@Override
-			public void run() {
-				if(neBranch != null) { /* on-going session _*/
-					try {
-
-						XeAsyncFlow flow = new XeAsyncFlow(ng, server, XeWebSession.this, neBranch, response);
-
-						/* branch inbound -> fire the appropriate function */
-						neBranch.inbound.consume(flow, inflow);
-
-					} catch (IOException e) {
-						ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error: " + e.getMessage()));
-					}	
-				}
-				else {
-					ng.pushAsyncTask(new SendError(response, HTTP2_Status.Bad_Gateway, "Error"));
+				public @Override String describe() {
+					return "Normal server processing";
 				}
 
-			}
+				public @Override MthProfile profile() {
+					return MthProfile.FX2;
+				}
 
-		});
+				@Override
+				public void run() {
+					if(neBranch != null) { /* on-going session _*/
+						try {
+
+							XeAsyncFlow flow = new XeAsyncFlow(ng, server, XeWebConnection.this, neBranch, response);
+
+							/* branch inbound -> fire the appropriate function */
+							neBranch.inbound.consume(flow, inflow);
+
+						} catch (IOException e) {
+							
+							/* clear busy */
+							isBusy.set(false);
+							
+							ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error: " + e.getMessage()));
+						}	
+					}
+					else {
+
+						/* clear busy */
+						isBusy.set(false);
+						
+						ng.pushAsyncTask(new SendError(response, HTTP2_Status.Bad_Gateway, "Error"));
+					}
+				}
+			});
+		}
+		else {
+			ng.pushAsyncTask(new SendError(response, HTTP2_Status.PROCESSING, "Busy connection"));
+		}
 	}
 
 

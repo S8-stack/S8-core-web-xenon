@@ -39,7 +39,7 @@ import com.s8.core.web.xenon.flow.tables.CreateTableOp;
 import com.s8.core.web.xenon.flow.tables.GetRowOp;
 import com.s8.core.web.xenon.flow.tables.PutRowOp;
 import com.s8.core.web.xenon.flow.tables.SelectRowsOp;
-import com.s8.core.web.xenon.sessions.XeWebSession;
+import com.s8.core.web.xenon.sessions.XeWebConnection;
 import com.s8.io.bohr.neon.core.NeBranch;
 
 
@@ -63,7 +63,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	/** 
 	 * The session 
 	 */
-	public final XeWebSession session;
+	public final XeWebConnection session;
 
 
 	/**
@@ -85,7 +85,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	private volatile boolean isTerminated = false;
 
-	private volatile boolean isActive = false;
+	private volatile boolean isLaunched = false;
 
 	/**
 	 * 
@@ -96,7 +96,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	public XeAsyncFlow(
 			SiliconEngine ng, 
 			XeWebServer server,
-			XeWebSession session,
+			XeWebConnection session,
 			NeBranch branch,
 			HTTP2_Message response) {
 		super();
@@ -147,7 +147,7 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	 * @return
 	 */
 	public boolean isRolling() {
-		synchronized (lock) { return isActive; }
+		synchronized (lock) { return isLaunched; }
 	}
 
 
@@ -167,10 +167,10 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 		synchronized (lock) {
 
-			if(!isTerminated && isActive == isContinued) {
+			if(!isTerminated && isLaunched == isContinued) {
 
 				if(!operations.isEmpty()) {
-					isActive = true;
+					isLaunched = true;
 
 					if(isContinued) {
 						/**
@@ -195,7 +195,8 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 					
 				}
 				else { // no more operation
-					isActive = false;
+					isLaunched = false;
+					
 				}
 			}
 		}
@@ -357,10 +358,18 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 	}
 
 
+	
 	public void terminate() {
 		isTerminated = true;
-	}
+		
 
+		/*
+		 * When flow terminates, no more operation are expected to be added, 
+		 * so we free the connection
+		 */
+		session.isBusy.set(false);
+	}
+	
 
 
 
