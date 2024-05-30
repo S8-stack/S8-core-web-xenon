@@ -24,7 +24,7 @@ import com.s8.core.arch.silicon.SiliconEngine;
 import com.s8.core.web.helium.http2.messages.HTTP2_Message;
 import com.s8.core.web.xenon.XeUser;
 import com.s8.core.web.xenon.XeWebServer;
-import com.s8.core.web.xenon.flow.delivery.XeDeliveryTask;
+import com.s8.core.web.xenon.flow.delivery.XeDeliveryOp;
 import com.s8.core.web.xenon.flow.mail.SendMailOp;
 import com.s8.core.web.xenon.flow.repos.CloneBranchOp;
 import com.s8.core.web.xenon.flow.repos.CommitBranchOp;
@@ -377,7 +377,8 @@ public class XeAsyncFlow implements S8AsyncFlow  {
 
 	@Override
 	public void deliver(int load, S8WebResourceGenerator generator) {
-		ng.pushAsyncTask(new XeDeliveryTask(ng, response, generator));
+		pushOperation(new XeDeliveryOp(this, generator, response));
+		play();
 	}
 
 
