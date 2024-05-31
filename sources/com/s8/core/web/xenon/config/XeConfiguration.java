@@ -6,8 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.s8.core.arch.magnesium.service.MgConfiguration;
 import com.s8.core.arch.silicon.SiliconConfiguration;
+import com.s8.core.arch.titanium.service.MgConfiguration;
 import com.s8.core.db.cobalt.CoConfiguration;
 import com.s8.core.db.copper.CuRepoDBConfiguration;
 import com.s8.core.db.tellurium.TeConfiguration;
