@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.s8.core.arch.silicon.SiliconConfiguration;
-import com.s8.core.arch.titanium.service.MgConfiguration;
+import com.s8.core.arch.titanium.service.TiConfiguration;
 import com.s8.core.db.cobalt.CoConfiguration;
 import com.s8.core.db.copper.CuRepoDBConfiguration;
 import com.s8.core.db.tellurium.TeConfiguration;
@@ -18,7 +18,7 @@ import com.s8.core.io.xml.handler.type.XML_TypeCompilationException;
 import com.s8.core.io.xml.parser.XML_ParsingException;
 import com.s8.core.web.carbon.web.CarbonWebService;
 import com.s8.core.web.helium.http2.HTTP2_WebConfiguration;
-import com.s8.core.web.manganese.ManganeseWebService;
+import com.s8.core.web.manganese.MgConfiguration;
 
 @XML_Type(root=true, name = "S8-Xenon-server")
 public class XeConfiguration {
@@ -52,18 +52,20 @@ public class XeConfiguration {
 		this.carbon = config;
 	}
 	
-	public ManganeseWebService.Config manganese;
+	
+	public MgConfiguration manganese;
 
 	@XML_SetElement(tag = "mail")
-	public void setMgService(ManganeseWebService.Config config) {
+	public void setMgService(MgConfiguration config) {
 		this.manganese = config;
 	}
 	
-	public MgConfiguration magnesium;
+	
+	public TiConfiguration tiConfig;
 
 	@XML_SetElement(tag = "databases")
-	public void setMagnesiumService(MgConfiguration config) {
-		this.magnesium = config;
+	public void setMagnesiumService(TiConfiguration config) {
+		this.tiConfig = config;
 	}
 	
 	public TeConfiguration tablesDb;
