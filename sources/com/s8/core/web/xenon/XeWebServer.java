@@ -18,6 +18,8 @@ import com.s8.core.web.helium.http2.HTTP2_Server;
 import com.s8.core.web.helium.http2.HTTP2_WebConfiguration;
 import com.s8.core.web.helium.rx.RxConnection;
 import com.s8.core.web.manganese.ManganeseWebService;
+import com.s8.core.web.xenon.boot.XeBoot;
+import com.s8.core.web.xenon.boot.XeBootService;
 import com.s8.core.web.xenon.config.XeConfiguration;
 import com.s8.core.web.xenon.config.XeMode;
 import com.s8.core.web.xenon.sessions.XeWebConnection;
@@ -35,7 +37,7 @@ public class XeWebServer extends HTTP2_Server {
 
 
 	public static XeWebServer build(XeCodebase codebase, 
-			XeBoot boot, 
+			XeBoot[] boot, 
 			String configPathname) throws Exception {
 		// build context
 		XML_Codebase lexicon = XML_Codebase.from(XeConfiguration.class);
@@ -53,9 +55,13 @@ public class XeWebServer extends HTTP2_Server {
 
 	public final XeCodebase codebase;
 	
-	public final XeBoot boot;
+	public final String pageTitle;
+	
 	
 	public final XeMode mode;
+	
+	
+	public final XeBootService bootService;
 
 
 	/**
@@ -89,28 +95,36 @@ public class XeWebServer extends HTTP2_Server {
 	 */
 	public XeWebServer(
 			XeCodebase codebase,
-			XeBoot boot,
+			XeBoot[] boots,
 			XML_Codebase lexicon,
 			XeConfiguration configuration) throws Exception {
 		super();
 
 
 		this.codebase = codebase;
-		this.boot = boot;
+		
 
 
 		webConfig = configuration.web;
 		
+
+		/** set name */
+		this.pageTitle = configuration.pageTitle;
+		
 		
 		/** set mode */
 		this.mode = configuration.mode;
-
+		
 
 		/*
 		 * create SILICON ENGINE
 		 */
 		siliconEngine = new SiliconEngine(configuration.silicon);
-
+		
+		/*
+		 * Create the boot service
+		 */
+		bootService = new XeBootService(siliconEngine, pageTitle, boots);
 
 		/**
 		 * create CARBON SERVICE

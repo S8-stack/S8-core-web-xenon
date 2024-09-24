@@ -23,6 +23,14 @@ import com.s8.core.web.manganese.MgConfiguration;
 @XML_Type(root=true, name = "S8-Xenon-server")
 public class XeConfiguration {
 
+	public String pageTitle = "AlphaVentor";
+	
+	@XML_SetElement(tag = "title")
+	public void setName(String title) {
+		this.pageTitle = title;
+	}
+	
+	
 	public XeMode mode = XeMode.STANDARD;
 
 	@XML_SetElement(tag = "mode")

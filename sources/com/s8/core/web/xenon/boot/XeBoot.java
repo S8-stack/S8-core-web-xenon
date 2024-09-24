@@ -1,10 +1,18 @@
-package com.s8.core.web.xenon;
+package com.s8.core.web.xenon.boot;
 
 import com.s8.api.flow.S8AsyncFlow;
 import com.s8.api.web.S8WebFront;
 
-@FunctionalInterface
+
+
 public interface XeBoot {
+	
+
+	/**
+	 * Declare boot name
+	 * @return
+	 */
+	public String getName();
 	
 	
 	/**

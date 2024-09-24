@@ -11,11 +11,12 @@ module com.s8.core.web.xenon {
 	
 	
 	exports com.s8.core.web.xenon;
-	
+	exports com.s8.core.web.xenon.boot;
 	exports com.s8.core.web.xenon.config;
 	exports com.s8.core.web.xenon.sessions;
 
 	exports com.s8.core.web.xenon.flow;
+	exports com.s8.core.web.xenon.protocol;
 	
 	
 	/* </xenon> */

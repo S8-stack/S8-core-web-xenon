@@ -15,14 +15,14 @@ import { XeServer } from './XeServer.js';
 import { XePage } from './XePage.js';
 
 
-export const launch = function(){
+export const launch = function(name){
 
     /* define S8 context */
     S8.server = new XeServer();
     S8.page = new XePage();
 
     /* create launcher */
-    const launcher = new XeLauncher();
+    const launcher = new XeLauncher(name);
 
     /* launch! */
     launcher.start();
@@ -36,8 +36,14 @@ class XeLauncher {
      * @type{InboardScreen}
      */
     inboardScreen;
+    
+    /**
+	 * @type{String}
+	 */
+    name;
 
-    constructor() {
+    constructor(name) {
+		this.name = name;
     }
 
 
@@ -46,13 +52,12 @@ class XeLauncher {
         let requestArrayBuffer = new ArrayBuffer(64);
         let outflow = new ByteOutflow(requestArrayBuffer);
         outflow.putUInt8(XENON_Keywords.BOOT);
+        outflow.putStringUTF8(this.name);
 
-        const _this = this;
+       // const _this = this;
         S8.server.sendRequest_HTTP2_POST(new Uint8Array(requestArrayBuffer), function (responseArrayBuffer) {
 
           
-
-
             /* Equip S8 with a NEON Branch, holding screen node */
             S8.branch = new NeBranch(XENON_Keywords.RUN_FUNC);
 

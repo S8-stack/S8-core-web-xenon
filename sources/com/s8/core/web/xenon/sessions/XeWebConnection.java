@@ -15,8 +15,10 @@ import com.s8.core.web.helium.http2.HTTP2_Status;
 import com.s8.core.web.helium.http2.messages.HTTP2_Message;
 import com.s8.core.web.xenon.XeUser;
 import com.s8.core.web.xenon.XeWebServer;
+import com.s8.core.web.xenon.boot.XeBoot;
 import com.s8.core.web.xenon.flow.XeAsyncFlow;
 import com.s8.core.web.xenon.protocol.XeRequestKeywords;
+import com.s8.core.web.xenon.protocol.XeRequestSyntax;
 import com.s8.core.web.xenon.tasks.HTTP2_ResponseT1Task;
 import com.s8.core.web.xenon.tasks.SendError;
 import com.s8.io.bohr.neon.core.NeBranch;
@@ -109,9 +111,17 @@ public class XeWebConnection extends HTTP2_Connection {
 	 * @param request
 	 */
 	private void serve_GET(HTTP2_Message request) {
-		server.carbonWebService.serve(request);
+		if(XeRequestSyntax.isBootPage(request.path.pathname)) {
+			/* serve boot */
+			server.bootService.serveBootPage(request);
+		}
+		else {
+			/* serve resource */
+			server.carbonWebService.serve(request);
+		}
 	}
-
+	
+	
 
 	/**
 	 * 
@@ -162,37 +172,46 @@ public class XeWebConnection extends HTTP2_Connection {
 	 * 
 	 * @param inflow
 	 * @param response
+	 * @throws IOException 
 	 */
-	private void serveBoot(ByteInflow inflow, HTTP2_Message response) {
-		ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
+	private void serveBoot(ByteInflow inflow, HTTP2_Message response) throws IOException {
+		
+		String name = inflow.getStringUTF8();
+		XeBoot boot = server.bootService.getBoot(name);
+		
+		if(boot != null) {
+			ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
 
-			public @Override String describe() {
-				return "Normal server processing";
-			}
-
-			public @Override MthProfile profile() {
-				return MthProfile.FX2;
-			}
-
-			@Override
-			public void run() {
-
-				// build new branch
-				neBranch = new NeBranch("w");
-
-				XeAsyncFlow flow = new XeAsyncFlow(ng, server, XeWebConnection.this, neBranch, response);
-
-				try {
-					// boot...
-					server.boot.boot(neBranch, flow);
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error"));
+				public @Override String describe() {
+					return "Normal server processing";
 				}
-			}
-		});
 
+				public @Override MthProfile profile() {
+					return MthProfile.FX2;
+				}
+
+				@Override
+				public void run() {
+					
+					// build new branch
+					neBranch = new NeBranch("w");
+
+					XeAsyncFlow flow = new XeAsyncFlow(ng, server, XeWebConnection.this, neBranch, response);
+
+					try {
+						// boot...
+						boot.boot(neBranch, flow);
+
+					} catch (Exception e) {
+						e.printStackTrace();
+						ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Error"));
+					}
+				}
+			});	
+		}
+		else {
+			ng.pushAsyncTask(new SendError(response, HTTP2_Status.BAD_REQUEST, "Boot cannot be found"));
+		}
 	}
 
 
