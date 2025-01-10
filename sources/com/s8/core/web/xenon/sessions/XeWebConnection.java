@@ -1,6 +1,7 @@
 package com.s8.core.web.xenon.sessions;
 
 import java.io.IOException;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -67,8 +68,8 @@ public class XeWebConnection extends HTTP2_Connection {
 	 */
 	// private WebSession session;
 
-	public XeWebConnection(SocketChannel socketChannel, XeWebServer server) throws IOException {
-		super(socketChannel, server.getWebConfiguration());
+	public XeWebConnection(SelectionKey key, SocketChannel channel, XeWebServer server) throws IOException {
+		super("xenon", key, channel, server.getWebConfiguration());
 
 		this.ng = server.siliconEngine;
 		this.server = server;

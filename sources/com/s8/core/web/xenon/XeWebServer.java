@@ -1,6 +1,7 @@
 package com.s8.core.web.xenon;
 
 import java.io.IOException;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 import com.s8.core.arch.silicon.SiliconEngine;
@@ -167,8 +168,8 @@ public class XeWebServer extends HTTP2_Server {
 
 
 	@Override
-	public RxConnection open(SocketChannel socketChannel) throws IOException {
-		return new XeWebConnection(socketChannel, this);
+	public RxConnection createConnection(SelectionKey key, SocketChannel socketChannel) throws IOException {
+		return new XeWebConnection(key, socketChannel, this);
 	}
 
 
@@ -208,8 +209,10 @@ public class XeWebServer extends HTTP2_Server {
 
 	}
 
+
+
 	@Override
-	public SiliconEngine getEngine() {
+	public SiliconEngine getSiliconEngine() {
 		return siliconEngine;
 	}
 }
