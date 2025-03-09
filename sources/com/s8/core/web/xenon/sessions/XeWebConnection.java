@@ -75,7 +75,7 @@ public class XeWebConnection extends HTTP2_Connection {
 
 
 		// perform initialization
-		HTTP2_initialize(server.getWebConfiguration());
+		http2_initialize(server.getWebConfiguration());
 	}
 
 
