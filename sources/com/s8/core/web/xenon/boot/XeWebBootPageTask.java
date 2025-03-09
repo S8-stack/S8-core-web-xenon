@@ -1,5 +1,6 @@
 package com.s8.core.web.xenon.boot;
 
+import com.s8.api.S8BootFunc;
 import com.s8.core.arch.silicon.async.AsyncSiTask;
 import com.s8.core.arch.silicon.async.MthProfile;
 import com.s8.core.io.bytes.linked.LinkedBytes;
@@ -9,7 +10,6 @@ import com.s8.core.web.helium.http2.headers.ContentType;
 import com.s8.core.web.helium.http2.headers.Status;
 import com.s8.core.web.helium.http2.messages.HTTP2_Message;
 import com.s8.core.web.helium.mime.MIME_Type;
-import com.s8.core.web.xenon.protocol.XeRequestSyntax;
 
 
 /**
@@ -47,7 +47,7 @@ public class XeWebBootPageTask implements AsyncSiTask {
 		// resolve
 		String webPathname = request.path.pathname;
 
-		String bootName = XeRequestSyntax.getBootName(webPathname);
+		String bootName = S8BootFunc.getBootName(webPathname);
 		
 		// look-up
 		XeBootHandler handler = service.handlers.get(bootName);

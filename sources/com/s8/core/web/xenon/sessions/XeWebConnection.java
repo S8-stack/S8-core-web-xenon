@@ -5,6 +5,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.s8.api.S8BootFunc;
 import com.s8.api.bytes.ByteInflow;
 import com.s8.core.arch.silicon.SiliconEngine;
 import com.s8.core.arch.silicon.async.MthProfile;
@@ -16,10 +17,8 @@ import com.s8.core.web.helium.http2.HTTP2_Status;
 import com.s8.core.web.helium.http2.messages.HTTP2_Message;
 import com.s8.core.web.xenon.XeUser;
 import com.s8.core.web.xenon.XeWebServer;
-import com.s8.core.web.xenon.boot.XeBootFunc;
 import com.s8.core.web.xenon.flow.XeAsyncFlow;
 import com.s8.core.web.xenon.protocol.XeRequestKeywords;
-import com.s8.core.web.xenon.protocol.XeRequestSyntax;
 import com.s8.core.web.xenon.tasks.HTTP2_ResponseT1Task;
 import com.s8.core.web.xenon.tasks.SendError;
 import com.s8.io.bohr.neon.core.NeBranch;
@@ -112,7 +111,7 @@ public class XeWebConnection extends HTTP2_Connection {
 	 * @param request
 	 */
 	private void serve_GET(HTTP2_Message request) {
-		if(XeRequestSyntax.isBootPage(request.path.pathname)) {
+		if(S8BootFunc.isBootPage(request.path.pathname)) {
 			/* serve boot */
 			server.bootService.serveBootPage(request);
 		}
@@ -178,7 +177,7 @@ public class XeWebConnection extends HTTP2_Connection {
 	private void serveBoot(ByteInflow inflow, HTTP2_Message response) throws IOException {
 		
 		String name = inflow.getStringUTF8();
-		XeBootFunc boot = server.bootService.getBoot(name);
+		S8BootFunc boot = server.bootService.getBoot(name);
 		
 		if(boot != null) {
 			ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
+import com.s8.api.S8BootFunc;
+import com.s8.api.S8Codebase;
 import com.s8.core.arch.silicon.SiliconEngine;
 import com.s8.core.db.cobalt.CoConfiguration;
 import com.s8.core.db.cobalt.store.SpaceMgDatabase;
@@ -19,7 +21,6 @@ import com.s8.core.web.helium.http2.HTTP2_Server;
 import com.s8.core.web.helium.http2.HTTP2_WebConfiguration;
 import com.s8.core.web.helium.rx.RxConnection;
 import com.s8.core.web.manganese.ManganeseWebService;
-import com.s8.core.web.xenon.boot.XeBootFunc;
 import com.s8.core.web.xenon.boot.XeBootService;
 import com.s8.core.web.xenon.config.XeConfiguration;
 import com.s8.core.web.xenon.config.XeMode;
@@ -37,15 +38,15 @@ public class XeWebServer extends HTTP2_Server {
 
 
 
-	public static XeWebServer build(XeCodebase codebase, 
-			XeBootFunc[] boot, 
+	public static XeWebServer build(S8Codebase codebase, 
+			S8BootFunc[] boots, 
 			String configPathname) throws Exception {
 		// build context
 		XML_Codebase lexicon = XML_Codebase.from(XeConfiguration.class);
 
 		XeConfiguration configuration = XeConfiguration.load(lexicon, configPathname);
 
-		return new XeWebServer(codebase, boot, lexicon, configuration);
+		return new XeWebServer(codebase, boots, lexicon, configuration);
 	}
 
 
@@ -54,7 +55,7 @@ public class XeWebServer extends HTTP2_Server {
 
 	public final SiliconEngine siliconEngine;
 
-	public final XeCodebase codebase;
+	public final S8Codebase codebase;
 	
 	public final String pageTitle;
 	
@@ -95,8 +96,8 @@ public class XeWebServer extends HTTP2_Server {
 	 * @throws Exception
 	 */
 	public XeWebServer(
-			XeCodebase codebase,
-			XeBootFunc[] boots,
+			S8Codebase codebase,
+			S8BootFunc[] boots,
 			XML_Codebase lexicon,
 			XeConfiguration configuration) throws Exception {
 		super();

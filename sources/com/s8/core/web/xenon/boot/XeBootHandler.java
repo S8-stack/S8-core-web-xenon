@@ -2,6 +2,7 @@ package com.s8.core.web.xenon.boot;
 
 import java.nio.charset.StandardCharsets;
 
+import com.s8.api.S8BootFunc;
 import com.s8.core.io.bytes.linked.LinkedBytes;
 
 
@@ -9,12 +10,12 @@ import com.s8.core.io.bytes.linked.LinkedBytes;
 class XeBootHandler {
 
 	
-	public final XeBootFunc boot;
+	public final S8BootFunc boot;
 	
 	private byte[] page;
 
 	
-	public XeBootHandler(XeBootFunc boot) {
+	public XeBootHandler(S8BootFunc boot) {
 		super();
 		this.boot = boot;
 	}
@@ -23,7 +24,7 @@ class XeBootHandler {
 	protected synchronized LinkedBytes generatePage(String title) {
 		
 		if(page == null) {
-			String name = boot.getName();
+			String name = boot.name;
 			
 			StringBuilder builder = new StringBuilder();
 			
