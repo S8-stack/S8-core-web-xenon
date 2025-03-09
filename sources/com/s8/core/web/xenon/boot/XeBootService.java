@@ -22,7 +22,7 @@ public class XeBootService {
 	final Map<String, XeBootHandler> handlers;
 	
 	
-	public XeBootService(SiliconEngine ng, String title, XeBoot[] boots) throws XeBootException {
+	public XeBootService(SiliconEngine ng, String title, XeBootFunc[] boots) throws XeBootException {
 		super();
 		this.ng = ng;
 		this.title = title;
@@ -30,7 +30,7 @@ public class XeBootService {
 		
 		handlers = new ConcurrentHashMap<String, XeBootHandler>();
 		if(boots != null) {
-			for(XeBoot boot : boots) {
+			for(XeBootFunc boot : boots) {
 				registerBoot(boot);
 			}
 			
@@ -43,7 +43,7 @@ public class XeBootService {
 		}
 	}
 	
-	private void registerBoot(XeBoot boot) throws XeBootException {
+	private void registerBoot(XeBootFunc boot) throws XeBootException {
 		String name = boot.getName();
 		if(name.contains("'")) {
 			throw new XeBootException("Char : ' is now allowed inside a boot name");
@@ -63,7 +63,7 @@ public class XeBootService {
 	 * @param name
 	 * @return
 	 */
-	public XeBoot getBoot(String name) {
+	public XeBootFunc getBoot(String name) {
 		XeBootHandler handler = handlers.get(name);
 		if(handler != null) {
 			return handler.boot;

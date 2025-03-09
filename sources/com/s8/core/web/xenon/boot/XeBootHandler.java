@@ -9,12 +9,12 @@ import com.s8.core.io.bytes.linked.LinkedBytes;
 class XeBootHandler {
 
 	
-	public final XeBoot boot;
+	public final XeBootFunc boot;
 	
 	private byte[] page;
 
 	
-	public XeBootHandler(XeBoot boot) {
+	public XeBootHandler(XeBootFunc boot) {
 		super();
 		this.boot = boot;
 	}

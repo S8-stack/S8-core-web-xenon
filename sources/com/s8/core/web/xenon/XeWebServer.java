@@ -19,7 +19,7 @@ import com.s8.core.web.helium.http2.HTTP2_Server;
 import com.s8.core.web.helium.http2.HTTP2_WebConfiguration;
 import com.s8.core.web.helium.rx.RxConnection;
 import com.s8.core.web.manganese.ManganeseWebService;
-import com.s8.core.web.xenon.boot.XeBoot;
+import com.s8.core.web.xenon.boot.XeBootFunc;
 import com.s8.core.web.xenon.boot.XeBootService;
 import com.s8.core.web.xenon.config.XeConfiguration;
 import com.s8.core.web.xenon.config.XeMode;
@@ -38,7 +38,7 @@ public class XeWebServer extends HTTP2_Server {
 
 
 	public static XeWebServer build(XeCodebase codebase, 
-			XeBoot[] boot, 
+			XeBootFunc[] boot, 
 			String configPathname) throws Exception {
 		// build context
 		XML_Codebase lexicon = XML_Codebase.from(XeConfiguration.class);
@@ -96,7 +96,7 @@ public class XeWebServer extends HTTP2_Server {
 	 */
 	public XeWebServer(
 			XeCodebase codebase,
-			XeBoot[] boots,
+			XeBootFunc[] boots,
 			XML_Codebase lexicon,
 			XeConfiguration configuration) throws Exception {
 		super();

@@ -16,7 +16,7 @@ import com.s8.core.web.helium.http2.HTTP2_Status;
 import com.s8.core.web.helium.http2.messages.HTTP2_Message;
 import com.s8.core.web.xenon.XeUser;
 import com.s8.core.web.xenon.XeWebServer;
-import com.s8.core.web.xenon.boot.XeBoot;
+import com.s8.core.web.xenon.boot.XeBootFunc;
 import com.s8.core.web.xenon.flow.XeAsyncFlow;
 import com.s8.core.web.xenon.protocol.XeRequestKeywords;
 import com.s8.core.web.xenon.protocol.XeRequestSyntax;
@@ -178,7 +178,7 @@ public class XeWebConnection extends HTTP2_Connection {
 	private void serveBoot(ByteInflow inflow, HTTP2_Message response) throws IOException {
 		
 		String name = inflow.getStringUTF8();
-		XeBoot boot = server.bootService.getBoot(name);
+		XeBootFunc boot = server.bootService.getBoot(name);
 		
 		if(boot != null) {
 			ng.pushAsyncTask(new HTTP2_ResponseT1Task(response) {
